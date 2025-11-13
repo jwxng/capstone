@@ -1,7 +1,3 @@
-from backend.initial_setup import base
+from backend.initialization import initialization as start
 
-# change this variable to track if user has initialized the application before (?)
-initialized = False
-
-if not initialized:
-    base.setup()
+start.initialization()
