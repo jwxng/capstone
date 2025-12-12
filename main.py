@@ -1,5 +1,6 @@
 import eel
 from backend.initialization import initialization as start
+from backend.data_retrieval import data_retrieval
 
 eel.init('frontend')
 
