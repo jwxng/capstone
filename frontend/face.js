@@ -350,11 +350,23 @@ function startLogging(periodMs = 90) {
   document.getElementById('download-csv').disabled = true;
 
   // If we don’t yet have categories, we’ll still start; snapshots will begin once data arrives
-  logTimer = setInterval(() => {
+  logTimer = setInterval(async () => {
     const row = snapshotRow();
+    
+    // THESE THREE LINES ARE FOR CSV DOWNLOADING FUNCTIONALITY, CAN REMOVE ONCE DEPRECATED
     if (row) rows.push(row);
     const status = document.getElementById('log-status');
     if (status) status.textContent = `logged rows: ${rows.length}`;
+
+    // If valid data available, send it to backend
+    if (row && header) {
+      await eel.data_retrieval(row, header);
+      
+      const status = document.getElementById('log-status');
+      if (status) {
+        status.textContent = `Data logged at: ${new Date().toLocaleTimeString()}`;
+      }
+    }
   }, periodMs);
 }
 
