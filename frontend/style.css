@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7ff;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- Overlay --- */
+#eye-break {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: all;
+  background: rgba(0,0,0,0.3);
+}
+
+/* --- Card Container --- */
+.card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+  width: 380px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* --- Flip Card --- */
+.flip-card {
+  width: 380px;
+  height: 380px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  perspective: 1000px; /* Added for better 3D effect */
+}
+
+.flip-card.flipped {
+  transform: rotateY(180deg);
+}
+
+/* --- Card Sides --- */
+.card-side {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 12px 34px rgba(0,0,50,0.15);
+  backface-visibility: hidden;
+  transform-style: preserve-3d; /* Added */
+}
+
+.card-front {
+  /* Front side - no transform needed */
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+/* --- Card Inner Content --- */
+.card-inner {
+  width: 100%;
+  height: 100%;
+  padding: 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- Second Card (Blink Card) --- */
+.card-second {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  padding: 30px;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 12px 34px rgba(0,0,50,0.15);
+  text-align: center;
+  z-index: 5;
+}
+
+/* --- Final Card --- */
+.card-final {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  min-height: 320px;
+  padding: 30px;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 12px 34px rgba(0,0,50,0.15);
+  text-align: center;
+  z-index: 10;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- Mascot/Icon --- */
+.mascot {
+  font-size: 60px;
+  margin-bottom: 10px;
+  animation: subtle-bounce 2s infinite ease-in-out;
+}
+
+.icon {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 10px;
+}
+
+/* --- Typography --- */
+h2 {
+  margin: 10px 0;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+p {
+  margin: 10px 0;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* --- Progress Bar --- */
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 14px 0;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: #4f46e5;
+  transition: width 0.1s linear;
+}
+
+/* --- Buttons --- */
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  background: #4f46e5;
+  color: white;
+  transition: 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+button:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+button:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- Eye Exercise Game --- */
+.eye-game-area {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  min-height: 240px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  margin: 10px 0;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.target-circle {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, #fff 0%, #ffd700 50%, #ff6b6b 100%);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 107, 107, 0.4);
+  cursor: pointer;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.3s ease-out;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.target-circle.active {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.target-circle:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.game-score {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.game-btn {
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* --- Animations --- */
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 107, 107, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 107, 107, 0.6);
+  }
+}
+
+/* Override absolute positioning for sequential cards */
+#card1, #card2, #card3, #card4, #blinkCard {
+  position: relative !important;
+}
+
+/* Make game card taller */
+#card3 {
+  min-height: 450px;
+}
+
+#card3 .eye-game-area {
+  height: 280px;
+  min-height: 280px;
+}
