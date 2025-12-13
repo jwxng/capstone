@@ -378,6 +378,8 @@ function stopLogging() {
   document.getElementById('start-log').disabled = false;
   document.getElementById('stop-log').disabled = true;
   document.getElementById('download-csv').disabled = rows.length === 0;
+
+  eel.data_clear();
 }
 
 function downloadCSV() {
