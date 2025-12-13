@@ -1,3 +1,2 @@
 frontend/node_modules/
-backend/data_retrieval/__pycache__/__init__.cpython-312.pyc
-backend/data_retrieval/__pycache__/data_retrieval.cpython-312.pyc
+**/__pycache__/

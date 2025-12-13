@@ -1,6 +1,6 @@
 import eel
 from backend.initialization import initialization as start
-from backend.data_retrieval import data_retrieval
+from backend.data_logging import data_logging
 
 eel.init('frontend')
 
