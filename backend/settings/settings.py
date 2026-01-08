@@ -33,10 +33,4 @@ class Settings:
         except Exception as e:
             print(f"Error saving settings: {e}")
 
-    # remove?
-    def check_setup_complete(self):
-        if self.data["terms_agreed"]:
-            print("Terms agreed.")
-            self.save_data()
-
 settings = Settings()
