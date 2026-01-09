@@ -1,6 +1,8 @@
 import eel
 import pandas as pd
 
+from backend.data_analysis import data_analysis
+
 working_data = pd.DataFrame()
 
 @eel.expose
@@ -20,7 +22,7 @@ def data_retrieval(rows, columns):
         working_data = pd.concat([working_data, working_df], ignore_index=True)
     
     print("Successfully received data.")
-    print(working_data)
+    data_analysis.data_analysis(working_data.tail(60))
 
 
 @eel.expose

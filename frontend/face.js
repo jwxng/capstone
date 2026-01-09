@@ -327,7 +327,7 @@ function snapshotRow() {
   return r;
 }
 
-function startLogging(periodMs = 90) {
+function startLogging(periodMs = 100) {
   if (logging) return;
   logging = true;
   rows.length = 0; // reset
