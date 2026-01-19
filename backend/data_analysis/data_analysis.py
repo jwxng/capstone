@@ -10,7 +10,7 @@ def data_analysis(df):
     # called by data_logging.py
     print("Analyzing data.")
     detect_squints(df.tail(1))
-    # detect_yawns(df)
+    detect_yawns(df)
 
 def detect_squints(df):
     avg_squint = (df['eyeSquintLeft'] + df['eyeSquintRight']) / 2
@@ -20,18 +20,14 @@ def detect_squints(df):
         print("ALERT: Squinting Detected!")
 
 def detect_yawns(df):
-    # We need the time_s conversion from your notebook to check duration
-    # We'll use the relative time within this batch
-    times = df['timestamp_ms'] / 1000.0
+    times = df['timestamp_ms'].astype(float) / 1000.0
     
-    is_jaw_open = df['jawOpen'] > JAW_OPEN_THRESHOLD
-    transitions = np.diff(is_jaw_open.astype(int))
-    
-    starts = np.where(transitions == 1)[0] + 1
-    ends = np.where(transitions == -1)[0] + 1
-    
-    # Loop through pairs of start/end to check duration
-    for s_idx, e_idx in zip(starts, ends):
-        duration = times.iloc[e_idx] - times.iloc[s_idx]
+    jaw_open_transition = np.diff((df['jawOpen'] > JAW_OPEN_THRESHOLD).astype(int))
+    starts = np.where(jaw_open_transition == 1)[0] + 1
+    ends = np.where(jaw_open_transition == -1)[0] + 1
+
+    # Loop through pairs of start/end times to check yawn duration
+    for start, end in zip(starts, ends):
+        duration = times.iloc[end] - times.iloc[start]
         if MIN_YAWN_SECONDS <= duration <= MAX_YAWN_SECONDS:
-            print(f"--- ALERT: Yawn detected! Duration: {round(duration, 2)}s ---")
+            print(f"ALERT: Yawn Detected! Duration: {round(duration, 2)}s ---")
