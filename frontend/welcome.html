@@ -14,8 +14,16 @@
         <p>Reduce eye strain and dry eyes with corrective eye exercises.</p>
     </div>
     <div class="action-section">
-        <button>Get started</button>
+        <button id="agree-button" onclick="handle_agreed()">Get started</button>
         <p>By continuing, you agree to our privacy policy.</p>
     </div>
+
+    <script type="text/javascript" src="/eel.js"></script>
+    <script>
+        async function handle_agreed() {
+            await eel.terms_agreed()(); 
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
 </html>

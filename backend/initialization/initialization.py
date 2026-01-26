@@ -1,11 +1,18 @@
+import eel
 from backend.settings import settings
 
-def initialization():
-    user_settings = settings.settings
-    if not user_settings.data["terms_agreed"]:
-        # INCORPORATE FRONTEND IN THIS BLOCK
-        print("Await user agreeing to terms.")
-        user_settings.data["terms_agreed"] = True # must be True to proceed
-        user_settings.save_data()
+user_settings = settings.settings
 
-    # start app
+def initialization():
+    if not user_settings.data["terms_agreed"]:
+        print("Await user agreeing to terms.")
+        eel.start("welcome.html")
+    else:
+        eel.start("index.html")
+    
+
+@eel.expose
+def terms_agreed():
+    print("Terms agreed.")
+    user_settings.data["terms_agreed"] = True 
+    user_settings.save_data()
