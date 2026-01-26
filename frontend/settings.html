@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Page</title>
+    <link rel="stylesheet" href="settings.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <div class="gear-icon"><img src="assets/gear.svg"/></div>
+        <h2>Settings</h2>
+    </div>
+    <div class="content">
+        <div class = "cam-detection">
+            <h3>Camera Detection</h3>
+            <div class="toggle-icon"><img src="assets/toggle.svg"/></div>
+        </div>
+        <div class = "notifications">
+            <h3>Notifications</h3>
+            <div class="top-row">
+                <div class="blink-rate card">
+                    <div class="eye-icon"><img src="assets/eye-2.svg"/></div>
+                    <div class="non-icon">
+                        <div class="title-toggle">
+                            <h3>Blink Rate</h3>
+                            <div class="toggle-icon"><img src="assets/toggle.svg"/></div>
+                        </div>
+                        <div class="text">
+                            <p>Enable gamified eye exercises when your blink rate deviates from your baseline</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="yawning card">
+                    <div class="yawn-icon"><img src="assets/yawn.svg"/></div>
+                    <div class="non-icon">
+                        <div class="title-toggle">
+                            <h3>Yawning</h3>
+                            <div class="toggle-icon"><img src="assets/toggle.svg"/></div>
+                        </div>
+                        <div class="text">
+                            <p>Get gamified eye exercises when you yawn more than your hourly average.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-row">
+                <div class="eyelid-closure card">
+                    <div class="eye-icon"><img src="assets/closed-eye.svg"/></div>
+                    <div class="non-icon">
+                        <div class="title-toggle">
+                            <h3>Eyelid Closure</h3>
+                            <div class="toggle-icon"><img src="assets/toggle.svg"/></div>
+                        </div>
+                        <div class="text">
+                            <p>Get gamified eye exercises when your PERCLOS metrics deviate from your baseline</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-time card">
+                    <div class="eye-icon"><img src="assets/screen-time.svg"/></div>
+                    <div class="non-icon">
+                        <div class="title-toggle">
+                            <h3>Screen Time</h3>
+                            <div class="toggle-icon"><img src="assets/toggle.svg"/></div>
+                        </div>
+                        <div class="text">
+                            <p>Get notified when you have not taken a break</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button>Start</button>
+        </div>
+    </div>
+</body>
+</html>

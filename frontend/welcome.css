@@ -1,0 +1,43 @@
+body {
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.header h2{
+    font-weight: 700;
+    font-size: 32px;
+}
+
+.header p{
+    font-weight: 500 !important;
+    font-size: 20px;
+    color: #4A5565 !important;
+}
+
+.blink-icon:hover img{
+    transform: scale(1.1);
+    transition: all 0.3s ease-in-out;
+}
+
+button{
+    background-color: #155DFC;
+    color: #ffffff;
+    width: 195px;
+    height: 56px;
+    border-radius: 15px;
+    padding: 10px 32px;
+    font-size: 22px;
+    border: none;
+    cursor: pointer;
+    margin-top: 40px;
+}
+
+button:hover{
+    background-color: #3B82F6;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+}
