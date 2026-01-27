@@ -5,7 +5,6 @@ CONFIG_FILE = 'settings.json'
 
 class Settings:
     def __init__(self):
-        print("Initializing settings file.")
         self.data = {
             "terms_agreed": False,
         }
