@@ -22,7 +22,7 @@ def data_retrieval(rows, columns):
         working_data = pd.concat([working_data, working_df], ignore_index=True)
     
     print("Successfully received data.")
-    data_analysis.data_analysis(working_data.tail(60))
+    data_analysis.data_analysis(working_data.tail(72000))
 
 
 @eel.expose
