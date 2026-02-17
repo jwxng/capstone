@@ -1,7 +1,12 @@
 import numpy as np
 import pandas as pd
+from backend.settings import settings
 
 CAMERA_FPS = 60 # can make this dynamic based on camera being used
+# Blink Parameters
+BLINK_START_THRESHOLD = 0.6
+BLINK_END_THRESHOLD = 0.3
+BLINK_RATE_LOW_TRIGGER = 15
 # PERCLOS Parameters
 PERCLOS_THRESHOLD = 0.5
 DROWSINESS_THRESHOLD_PERCENTAGE = 15
@@ -13,23 +18,60 @@ FRAMES_IN_WINDOW = PERCLOS_WINDOW_SECONDS * CAMERA_FPS
 JAW_OPEN_THRESHOLD = 0.6
 MIN_YAWN_SECONDS = 1.0
 MAX_YAWN_SECONDS = 6.0
-# Blink Parameters
-BLINK_START_THRESHOLD = 0.6
-BLINK_END_THRESHOLD = 0.3
 
+# Main Function
 # called by data_logging.py
 def data_analysis(df):
     print("Analyzing data.")
+
+    current_settings = settings.settings
 
     # create column for timestamps measured in seconds
     df['timestamp_s'] = df['timestamp_ms'].astype(float) / 1000.0
 
     # perform detections
-    calculate_perclos(df)
-    detect_yawns(df)
-    detect_blinks(df)
+    if current_settings.data["blink_rate"]:
+        detect_blinks(df)
+
+    if current_settings.data["perclos"]:
+        calculate_perclos(df)
+
+    if current_settings.data["yawning"]:
+        detect_yawns(df)
 
 # Main Calculation Functions
+def detect_blinks(df):
+    df_duration = df['timestamp_s'].iloc[-1] - df['timestamp_s'].iloc[0]
+    avg_blink = (df['eyeBlinkLeft'] + df['eyeBlinkRight']) / 2
+
+    blink_count = 0
+    total_blinking_time = 0
+
+    is_blinking = False
+    blink_start_time = None
+    blink_end_time = None
+    prev_blink_val = avg_blink[0]
+
+    for i in range(len(avg_blink)):
+        curr_time = df['timestamp_s'].iloc[i]
+        curr_blink_val = avg_blink.iloc[i]
+
+        if not is_blinking and prev_blink_val <= BLINK_START_THRESHOLD and curr_blink_val > BLINK_START_THRESHOLD:
+            is_blinking = True
+            blink_start_time = curr_time
+       
+        elif is_blinking and prev_blink_val >= BLINK_END_THRESHOLD and curr_blink_val < BLINK_END_THRESHOLD:
+            is_blinking = False
+            blink_end_time = curr_time
+            curr_duration = blink_end_time - blink_start_time
+            total_blinking_time += curr_duration
+            blink_count += 1
+
+        prev_blink_val = curr_blink_val
+
+    blink_rate = blink_count / (df_duration / 60)
+    print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
+
 def calculate_perclos(df):
     df_start_time = df['timestamp_s'].iloc[0]
     avg_squint = (df['eyeSquintLeft'] + df['eyeSquintRight']) / 2
@@ -104,38 +146,6 @@ def detect_yawns(df):
         duration = df['timestamp_s'].iloc[end] - df['timestamp_s'].iloc[start]
         if MIN_YAWN_SECONDS <= duration <= MAX_YAWN_SECONDS:
             print(f"ALERT: Yawn lasting {round(duration, 2)}s was Detected!")
-
-def detect_blinks(df):
-    df_duration = df['timestamp_s'].iloc[-1] - df['timestamp_s'].iloc[0]
-    avg_blink = (df['eyeBlinkLeft'] + df['eyeBlinkRight']) / 2
-
-    blink_count = 0
-    total_blinking_time = 0
-
-    is_blinking = False
-    blink_start_time = None
-    blink_end_time = None
-    prev_blink_val = avg_blink[0]
-
-    for i in range(len(avg_blink)):
-        curr_time = df['timestamp_s'].iloc[i]
-        curr_blink_val = avg_blink.iloc[i]
-
-        if not is_blinking and prev_blink_val <= BLINK_START_THRESHOLD and curr_blink_val > BLINK_START_THRESHOLD:
-            is_blinking = True
-            blink_start_time = curr_time
-       
-        elif is_blinking and prev_blink_val >= BLINK_END_THRESHOLD and curr_blink_val < BLINK_END_THRESHOLD:
-            is_blinking = False
-            blink_end_time = curr_time
-            curr_duration = blink_end_time - blink_start_time
-            total_blinking_time += curr_duration
-            blink_count += 1
-
-        prev_blink_val = curr_blink_val
-
-    blink_rate = blink_count / (df_duration / 60)
-    print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
 
 # Helper Functions
 def calculate_perclos_at_time(time_iteration, closure_events):
