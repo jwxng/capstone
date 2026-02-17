@@ -20,9 +20,11 @@ def data_retrieval(rows, columns):
         working_data = working_df
     else:
         working_data = pd.concat([working_data, working_df], ignore_index=True)
+        # Remove older entries
+        working_data = working_data.tail(72000)
     
     print("Successfully received data.")
-    data_analysis.data_analysis(working_data.tail(72000))
+    data_analysis.data_analysis(working_data)
 
 
 @eel.expose
