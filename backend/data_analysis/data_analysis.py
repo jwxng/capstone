@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
+from backend.data_tracker import data_tracker
 from backend.settings import settings
 
 CAMERA_FPS = 60 # can make this dynamic based on camera being used
+SECONDS_BETWEEN_WARNINGS = 300
 # Blink Parameters
 BLINK_START_THRESHOLD = 0.6
 BLINK_END_THRESHOLD = 0.3
@@ -23,15 +25,16 @@ MAX_YAWN_SECONDS = 6.0
 # called by data_logging.py
 def data_analysis(df):
     print("Analyzing data.")
-
+    
     current_settings = settings.settings
+    current_tracked_data = data_tracker.data_tracker
 
     # create column for timestamps measured in seconds
     df['timestamp_s'] = df['timestamp_ms'].astype(float) / 1000.0
 
     # perform detections
     if current_settings.data["blink_rate"]:
-        detect_blinks(df)
+        detect_blinks(df, current_tracked_data)
 
     if current_settings.data["perclos"]:
         calculate_perclos(df)
@@ -40,8 +43,10 @@ def data_analysis(df):
         detect_yawns(df)
 
 # Main Calculation Functions
-def detect_blinks(df):
-    df_duration = df['timestamp_s'].iloc[-1] - df['timestamp_s'].iloc[0]
+def detect_blinks(df, current_tracked_data):
+    df_start_time = df['timestamp_s'].iloc[0]
+    df_end_time = df['timestamp_s'].iloc[-1]
+    df_duration = df_end_time - df_start_time
     avg_blink = (df['eyeBlinkLeft'] + df['eyeBlinkRight']) / 2
 
     blink_count = 0
@@ -71,6 +76,10 @@ def detect_blinks(df):
 
     blink_rate = blink_count / (df_duration / 60)
     print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
+
+    if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - current_tracked_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+        print("WARNING: Blink rate was detected to be very low.")
+        current_tracked_data.data['last_warning'] = df_duration
 
 def calculate_perclos(df):
     df_start_time = df['timestamp_s'].iloc[0]

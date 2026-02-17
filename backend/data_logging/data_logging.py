@@ -2,6 +2,7 @@ import eel
 import pandas as pd
 
 from backend.data_analysis import data_analysis
+from backend.data_tracker import data_tracker
 
 working_data = pd.DataFrame()
 
@@ -30,7 +31,9 @@ def data_retrieval(rows, columns):
 @eel.expose
 def data_clear():
     global working_data
+    current_tracked_data = data_tracker.data_tracker
 
     working_data = pd.DataFrame()
+    current_tracked_data.reset_tracker()
     print("Memory cleared.")
     print(working_data)
