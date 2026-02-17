@@ -7,6 +7,11 @@ class Settings:
     def __init__(self):
         self.data = {
             "terms_agreed": False,
+            # exercises enabled by default
+            "blink_rate": True,
+            "perclos": True,
+            "yawning": True,
+            "screen_time": True,
         }
         self.load_data()
 
