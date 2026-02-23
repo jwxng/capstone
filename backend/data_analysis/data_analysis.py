@@ -34,7 +34,38 @@ def data_analysis(df):
 
     # perform detections
     if current_settings.data["blink_rate"]:
-        detect_blinks(df, current_tracked_data)
+        #check if we have already calibrated 
+        if 'calibrated' not in df.columns:
+            #creating a column to indicate if we have calibrated or not
+            df['calibrated'] = False
+            #create a column to store the baseline blinkrate
+            df['baseline_blink_rate'] = None
+
+        #calibration status
+        is_calibrated = df['calibrated'].iloc[0]
+        
+        if not is_calibrated:
+            #ensure that the calibration only uses the first 5 minutes of data
+            df_duration = df['timestamp_s'].iloc[-1] - df['timestamp_s'].iloc[0]
+
+            if 295 <= df_duration <= 305:
+                #about 5 minutes, the range is incase there isn't a time exactly at 5 min
+                baseline = blink_calibration(df)
+
+                #update the calibration status
+                df['calibrated'] = True
+                df['baseline_blink_rate'] = baseline
+
+                #compare the baseline value with blink_rate being calculated
+                detect_blinks(df, current_tracked_data, baseline)
+
+            else:
+                #still collecting data
+                print("Still collecting data to properly calibrate")
+        else:
+            #there is already a calibration value
+            baseline = df['baseline_blink_rate'].iloc[0]
+            detect_blinks(df, current_tracked_data, baseline)
 
     if current_settings.data["perclos"]:
         calculate_perclos(df)
@@ -42,8 +73,61 @@ def data_analysis(df):
     if current_settings.data["yawning"]:
         detect_yawns(df)
 
+#Calibration 
+"""
+The calibration function is only going to be done for the blink rate, where we will collect user data for about 5 minutes to establish what
+the users 'ideal' blink rate. The calibration value will then be compared against by the blink-rate being measured in real-time. If the real-time
+measurements detect that the users blink rate has fallen significantly below the established baseline, then the appropriate game will be called
+"""
+
+def blink_calibration(df):
+
+    #the functionality is the same as blink rate with slight change
+    #a more efficient DRY method will be added later
+
+    #calibration will take 5 minutes (300s)
+    df_start_time = df['timestamp_s'].iloc[0]
+    df_duration = 300
+    calibration_end_time = df_start_time + df_duration
+   
+
+    avg_blink = (df['eyeBlinkLeft'] + df['eyeBlinkRight']) / 2
+
+    blink_count = 0
+    total_blinking_time = 0
+
+    is_blinking = False
+    blink_start_time = None
+    blink_end_time = None
+    prev_blink_val = avg_blink[0]
+
+    for i in range(len(avg_blink)):
+        curr_time = df['timestamp_s'].iloc[i]
+
+        #this is to ensure that only the first 5 minutes of data are used to calibrate the user's blink rate
+        if curr_time > calibration_end_time:
+            break
+
+        curr_blink_val = avg_blink.iloc[i]
+
+        if not is_blinking and prev_blink_val <= BLINK_START_THRESHOLD and curr_blink_val > BLINK_START_THRESHOLD:
+            is_blinking = True
+            blink_start_time = curr_time
+       
+        elif is_blinking and prev_blink_val >= BLINK_END_THRESHOLD and curr_blink_val < BLINK_END_THRESHOLD:
+            is_blinking = False
+            blink_end_time = curr_time
+            curr_duration = blink_end_time - blink_start_time
+            total_blinking_time += curr_duration
+            blink_count += 1
+
+        prev_blink_val = curr_blink_val
+
+    return (blink_count / (df_duration / 60))
+    
+    
 # Main Calculation Functions
-def detect_blinks(df, current_tracked_data):
+def detect_blinks(df, current_tracked_data, baseline_blink_rate):
     df_start_time = df['timestamp_s'].iloc[0]
     df_end_time = df['timestamp_s'].iloc[-1]
     df_duration = df_end_time - df_start_time
@@ -77,7 +161,11 @@ def detect_blinks(df, current_tracked_data):
     blink_rate = blink_count / (df_duration / 60)
     print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
 
-    if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - current_tracked_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    # if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - current_tracked_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    #     print("WARNING: Blink rate was detected to be very low.")
+    #     current_tracked_data.data['last_warning'] = df_duration
+
+    if blink_rate < baseline_blink_rate and df_duration - current_tracked_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("WARNING: Blink rate was detected to be very low.")
         current_tracked_data.data['last_warning'] = df_duration
 
