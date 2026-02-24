@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from backend.data_tracker import data_tracker
+from backend.alert_tracker import alert_tracker
 from backend.settings import settings
 
 CAMERA_FPS = 60 # can make this dynamic based on camera being used
@@ -27,45 +27,42 @@ def data_analysis(df):
     print("Analyzing data.")
     
     current_settings = settings.settings
-    current_tracked_data = data_tracker.data_tracker
-
-    # create column for timestamps measured in seconds
-    df['timestamp_s'] = df['timestamp_ms'].astype(float) / 1000.0
-
+    alert_tracker_data = alert_tracker.alert_tracker
+    
     # perform detections
-    if current_settings.data["blink_rate"]:
-        #check if we have already calibrated 
-        if 'calibrated' not in df.columns:
-            #creating a column to indicate if we have calibrated or not
-            df['calibrated'] = False
-            #create a column to store the baseline blinkrate
-            df['baseline_blink_rate'] = None
+    # if current_settings.data["blink_rate"]:
+    #     #check if we have already calibrated 
+    #     if 'calibrated' not in df.columns:
+    #         #creating a column to indicate if we have calibrated or not
+    #         df['calibrated'] = False
+    #         #create a column to store the baseline blinkrate
+    #         df['baseline_blink_rate'] = None
 
-        #calibration status
-        is_calibrated = df['calibrated'].iloc[0]
+    #     #calibration status
+    #     is_calibrated = df['calibrated'].iloc[0]
         
-        if not is_calibrated:
-            #ensure that the calibration only uses the first 5 minutes of data
-            df_duration = df['timestamp_s'].iloc[-1] - df['timestamp_s'].iloc[0]
+    #     if not is_calibrated:
+    #         #ensure that the calibration only uses the first 5 minutes of data
+    #         df_duration = df['timestamp_s'].iloc[-1] - df['timestamp_s'].iloc[0]
 
-            if 295 <= df_duration <= 305:
-                #about 5 minutes, the range is incase there isn't a time exactly at 5 min
-                baseline = blink_calibration(df)
+    #         if 295 <= df_duration <= 305:
+    #             #about 5 minutes, the range is incase there isn't a time exactly at 5 min
+    #             baseline = blink_calibration(df)
 
-                #update the calibration status
-                df['calibrated'] = True
-                df['baseline_blink_rate'] = baseline
+    #             #update the calibration status
+    #             df['calibrated'] = True
+    #             df['baseline_blink_rate'] = baseline
 
-                #compare the baseline value with blink_rate being calculated
-                detect_blinks(df, current_tracked_data, baseline)
+    #             #compare the baseline value with blink_rate being calculated
+    #             detect_blinks(df, alert_tracker_data, baseline)
 
-            else:
-                #still collecting data
-                print("Still collecting data to properly calibrate")
-        else:
-            #there is already a calibration value
-            baseline = df['baseline_blink_rate'].iloc[0]
-            detect_blinks(df, current_tracked_data, baseline)
+    #         else:
+    #             #still collecting data
+    #             print("Still collecting data to properly calibrate")
+    #     else:
+    #         #there is already a calibration value
+    #         baseline = df['baseline_blink_rate'].iloc[0]
+    #         detect_blinks(df, alert_tracker_data, baseline)
 
     if current_settings.data["perclos"]:
         calculate_perclos(df)
@@ -127,7 +124,7 @@ def blink_calibration(df):
     
     
 # Main Calculation Functions
-def detect_blinks(df, current_tracked_data, baseline_blink_rate):
+def detect_blinks(df, alert_tracker_data, baseline_blink_rate):
     df_start_time = df['timestamp_s'].iloc[0]
     df_end_time = df['timestamp_s'].iloc[-1]
     df_duration = df_end_time - df_start_time
@@ -161,13 +158,13 @@ def detect_blinks(df, current_tracked_data, baseline_blink_rate):
     blink_rate = blink_count / (df_duration / 60)
     print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
 
-    # if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - current_tracked_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    # if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
     #     print("WARNING: Blink rate was detected to be very low.")
-    #     current_tracked_data.data['last_warning'] = df_duration
+    #     alert_tracker_data.data['last_warning'] = df_duration
 
-    if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - current_tracked_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if blink_rate < baseline_blink_rate and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("WARNING: Blink rate was detected to be very low.")
-        current_tracked_data.data['last_warning'] = df_duration
+        alert_tracker_data.data['last_warning'] = df_duration
 
 def calculate_perclos(df):
     df_start_time = df['timestamp_s'].iloc[0]

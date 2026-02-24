@@ -1,4 +1,5 @@
 frontend/node_modules/
 **/__pycache__/
 frontend/package-lock.json
+data_calibration.csv
 settings.json

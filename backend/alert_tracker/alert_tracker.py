@@ -1,4 +1,4 @@
-class DataTracker:
+class AlertTracker:
     def __init__(self):
         self.data = {
             "last_warning": 0,
@@ -10,4 +10,4 @@ class DataTracker:
     def reset_tracker(self):
         self.data["last_warning"] = 0
 
-data_tracker = DataTracker()
+alert_tracker = AlertTracker()
