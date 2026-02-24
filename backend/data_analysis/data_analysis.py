@@ -165,7 +165,7 @@ def detect_blinks(df, current_tracked_data, baseline_blink_rate):
     #     print("WARNING: Blink rate was detected to be very low.")
     #     current_tracked_data.data['last_warning'] = df_duration
 
-    if blink_rate < baseline_blink_rate and df_duration - current_tracked_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - current_tracked_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("WARNING: Blink rate was detected to be very low.")
         current_tracked_data.data['last_warning'] = df_duration
 
