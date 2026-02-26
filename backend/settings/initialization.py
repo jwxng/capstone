@@ -1,7 +1,5 @@
 import eel
-from backend.settings import settings
-
-user_settings = settings.settings
+from backend.settings.settings import settings as user_settings
 
 def initialization():
     if not user_settings.data["terms_agreed"]:

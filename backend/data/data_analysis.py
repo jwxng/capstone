@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-from backend.alert_tracker import alert_tracker
-from backend.settings import settings
-from backend.data_calibration import data_calibration
+from backend.data.alert_tracker import alert_tracker
+from backend.data.data_calibration import data_calibration
+from backend.settings.settings import settings
 
 CAMERA_FPS = 60 # can make this dynamic based on camera being used
 SECONDS_BETWEEN_WARNINGS = 300
@@ -26,29 +26,23 @@ MAX_YAWN_SECONDS = 6.0
 def data_analysis(df):
     print("Analyzing data.")
     
-    current_settings = settings.settings
-    alert_tracker_data = alert_tracker.alert_tracker
-    calibration_data = data_calibration.data_calibration
-    
-    if current_settings.data['blink_rate']:
+    if settings.data['blink_rate']:
         #get the baseline from the calibration file
-        baseline_blink_rate = calibration_data.get_baseline()
+        baseline_blink_rate = data_calibration.get_baseline()
 
         if baseline_blink_rate != -1:
             #use baseline to compare
-            detect_blinks(df, alert_tracker_data, baseline_blink_rate)
-            #just to test if it gets the baseline value
-            print(baseline_blink_rate)
+            detect_blinks(df, baseline_blink_rate)
 
-    if current_settings.data["perclos"]:
-        calculate_perclos(df, alert_tracker_data)
+    if settings.data["perclos"]:
+        calculate_perclos(df)
 
-    if current_settings.data["yawning"]:
-        detect_yawns(df, alert_tracker_data)
+    if settings.data["yawning"]:
+        detect_yawns(df)
 
     
 # Main Calculation Functions
-def detect_blinks(df, alert_tracker_data, baseline_blink_rate):
+def detect_blinks(df, baseline_blink_rate):
     df_start_time = df['timestamp_s'].iloc[0]
     df_end_time = df['timestamp_s'].iloc[-1]
     df_duration = df_end_time - df_start_time
@@ -82,16 +76,16 @@ def detect_blinks(df, alert_tracker_data, baseline_blink_rate):
     blink_rate = blink_count / (df_duration / 60)
     print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
 
-    # if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    # if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
     #     print("WARNING: Blink rate was detected to be very low.")
-    #     alert_tracker_data.data['last_warning'] = df_duration
+    #     alert_tracker.data['last_warning'] = df_duration
 
-    if blink_rate < baseline_blink_rate and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if blink_rate < baseline_blink_rate and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("Blink rate detected to be low; produce alert")
-        alert_tracker_data.data['last_warning'] = df_duration
+        alert_tracker.data['last_warning'] = df_duration
 
 
-def calculate_perclos(df, alert_tracker_data):
+def calculate_perclos(df):
     df_start_time = df['timestamp_s'].iloc[0]
     df_end_time = df['timestamp_s'].iloc[-1]
     df_duration = df_end_time - df_start_time
@@ -137,9 +131,9 @@ def calculate_perclos(df, alert_tracker_data):
     # print(f"Calculated {len(perclos_values)} PERCLOS values")
     print(f"Current PERCLOS: {perclos_values[-1]:.2f}%")
 
-    if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("Drowsiness detected; produce alert")
-        alert_tracker_data.data['last_warning'] = df_duration
+        alert_tracker.data['last_warning'] = df_duration
     # print(f"Average PERCLOS: {np.mean(perclos_values):.2f}%")
     # print(f"Minimum PERCLOS: {np.min(perclos_values):.2f}%")
     # print(f"Maximum PERCLOS: {np.max(perclos_values):.2f}%")
@@ -162,7 +156,7 @@ def calculate_perclos(df, alert_tracker_data):
     #     print(f"{perclos_timestamps[i]:8.2f} | {perclos_values[i]:7.2f}%")
 
 
-def detect_yawns(df, alert_tracker_data):
+def detect_yawns(df):
     df_start_time = df['timestamp_s'].iloc[0]
     df_end_time = df['timestamp_s'].iloc[-1]
     df_duration = df_end_time - df_start_time
@@ -178,9 +172,9 @@ def detect_yawns(df, alert_tracker_data):
             yawn_count += 1
 
     # 5 YAWNS IS ARBITRARY NUMBER, CHANGE LATER BASED ON LITERATURE AND TESTS
-    if yawn_count > 5 and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if yawn_count > 5 and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("More than 5 yawns detected; produce alert.")
-        alert_tracker_data.data['last_warning'] = df_duration
+        alert_tracker.data['last_warning'] = df_duration
 
 
 # Helper Functions
