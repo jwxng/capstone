@@ -15,7 +15,6 @@ DROWSINESS_THRESHOLD_PERCENTAGE = 15
 MIN_CLOSED_SECONDS = 0.5 
 MAX_CLOSED_SECONDS = 15
 PERCLOS_WINDOW_SECONDS = 60
-FRAMES_IN_WINDOW = PERCLOS_WINDOW_SECONDS * CAMERA_FPS 
 # Yawn Parameters
 JAW_OPEN_THRESHOLD = 0.6
 MIN_YAWN_SECONDS = 1.0
@@ -65,10 +64,10 @@ def data_analysis(df):
     #         detect_blinks(df, alert_tracker_data, baseline)
 
     if current_settings.data["perclos"]:
-        calculate_perclos(df)
+        calculate_perclos(df, alert_tracker_data)
 
     if current_settings.data["yawning"]:
-        detect_yawns(df)
+        detect_yawns(df, alert_tracker_data)
 
 #Calibration 
 """
@@ -163,11 +162,13 @@ def detect_blinks(df, alert_tracker_data, baseline_blink_rate):
     #     alert_tracker_data.data['last_warning'] = df_duration
 
     if blink_rate < baseline_blink_rate and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
-        print("WARNING: Blink rate was detected to be very low.")
+        print("Blink rate detected to be low; produce alert")
         alert_tracker_data.data['last_warning'] = df_duration
 
-def calculate_perclos(df):
+def calculate_perclos(df, alert_tracker_data):
     df_start_time = df['timestamp_s'].iloc[0]
+    df_end_time = df['timestamp_s'].iloc[-1]
+    df_duration = df_end_time - df_start_time
     avg_squint = (df['eyeSquintLeft'] + df['eyeSquintRight']) / 2
     eye_closed = (avg_squint >= PERCLOS_THRESHOLD).astype(int)
 
@@ -209,6 +210,10 @@ def calculate_perclos(df):
 
     # print(f"Calculated {len(perclos_values)} PERCLOS values")
     print(f"Current PERCLOS: {perclos_values[-1]:.2f}%")
+
+    if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+        print("Drowsiness detected; produce alert")
+        alert_tracker_data.data['last_warning'] = df_duration
     # print(f"Average PERCLOS: {np.mean(perclos_values):.2f}%")
     # print(f"Minimum PERCLOS: {np.min(perclos_values):.2f}%")
     # print(f"Maximum PERCLOS: {np.max(perclos_values):.2f}%")
@@ -231,15 +236,26 @@ def calculate_perclos(df):
     #     print(f"{perclos_timestamps[i]:8.2f} | {perclos_values[i]:7.2f}%")
 
 
-def detect_yawns(df):
+def detect_yawns(df, alert_tracker_data):
+    df_start_time = df['timestamp_s'].iloc[0]
+    df_end_time = df['timestamp_s'].iloc[-1]
+    df_duration = df_end_time - df_start_time
     yawn_transitions = np.diff((df['jawOpen'] > JAW_OPEN_THRESHOLD).astype(int))
     yawn_starts = np.where(yawn_transitions == 1)[0] + 1
     yawn_ends = np.where(yawn_transitions == -1)[0] + 1
+    yawn_count = 0
 
     for start, end in zip(yawn_starts, yawn_ends):
         duration = df['timestamp_s'].iloc[end] - df['timestamp_s'].iloc[start]
         if MIN_YAWN_SECONDS <= duration <= MAX_YAWN_SECONDS:
             print(f"ALERT: Yawn lasting {round(duration, 2)}s was Detected!")
+            yawn_count += 1
+
+    # 5 YAWNS IS ARBITRARY NUMBER, CHANGE LATER BASED ON LITERATURE AND TESTS
+    if yawn_count > 5 and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+        print("More than 5 yawns detected; produce alert.")
+        alert_tracker_data.data['last_warning'] = df_duration
+
 
 # Helper Functions
 def calculate_perclos_at_time(time_iteration, closure_events):
