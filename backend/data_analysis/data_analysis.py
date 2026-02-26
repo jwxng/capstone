@@ -28,29 +28,23 @@ def data_analysis(df):
     
     current_settings = settings.settings
     alert_tracker_data = alert_tracker.alert_tracker
+    calibration_data = data_calibration.data_calibration
     
     if current_settings.data['blink_rate']:
-        try:
-            #get the baseline from the calibration file
-            baseline = data_calibration.get_baseline()
+        #get the baseline from the calibration file
+        baseline_blink_rate = calibration_data.get_baseline()
 
-            if baseline is not None:
-                #we can use the baseline to compare
-                detect_blinks(df, alert_tracker_data, BLINK_RATE_LOW_TRIGGER)
-                #just to test if it gets the baseline value
-                print(baseline)
-            else:
-                #there is no calibrated data yet
-                data_calibration.save_data(df)
-        except Exception as e:
-            print(f"Error in detection {e}")
+        if baseline_blink_rate != -1:
+            #use baseline to compare
+            detect_blinks(df, alert_tracker_data, baseline_blink_rate)
+            #just to test if it gets the baseline value
+            print(baseline_blink_rate)
 
     if current_settings.data["perclos"]:
         calculate_perclos(df, alert_tracker_data)
 
     if current_settings.data["yawning"]:
         detect_yawns(df, alert_tracker_data)
-
 
     
 # Main Calculation Functions
@@ -95,6 +89,7 @@ def detect_blinks(df, alert_tracker_data, baseline_blink_rate):
     if blink_rate < baseline_blink_rate and df_duration - alert_tracker_data.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("Blink rate detected to be low; produce alert")
         alert_tracker_data.data['last_warning'] = df_duration
+
 
 def calculate_perclos(df, alert_tracker_data):
     df_start_time = df['timestamp_s'].iloc[0]
