@@ -21,118 +21,40 @@
 
     <title>Eye Break Reminder + Face Landmarker</title>
 
-    <!-- Fonts & Styles -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="mediapipe.css">
 
-    <!-- Material Components (for Face Landmarker demo buttons) -->
     <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
     <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 
-    <!-- Scripts -->
     <script src="overlay.js" defer></script>
     <script type="module" src="face.js" defer></script>
     <script type="text/javascript" src="/eel.js"></script>
   </head>
 
   <body>
-    <!-- 🌟 Eye Break Reminder Section -->
-    <!-- 🌟 Eye Break Reminder Section -->
-<!-- 🌟 Eye Break Reminder Section -->
-<!-- 🌟 Eye Break Reminder Section -->
-<!-- <section id="eye-break">
-  <div class="card-container">
-    
-    CARD 1: Eye Break Reminder
-    <div class="card-side card-second" id="card1">
-      <div class="mascot"><img src="assets/clock-circle.svg" class="icon" /></div>
-      <h2>Eye Break Time!</h2>
-      <p>You've been staring for a while 👀<br>
-        Look at something 20 ft away for 20 seconds 💫</p>
-      <button id="nextToDidYouKnow">Okay!</button>
-    </div>
-
-    CARD 2: Did You Know
-    <div class="card-side card-second" id="card2" style="display: none;">
-      <div class="mascot">📚🐣</div> 
-      <h2>Did You Know?</h2> 
-      <p>50–90% of people who use digital screens experience 
-        <strong>Computer Vision Syndrome</strong> 😳</p> 
-      <p style="font-size: 14px; margin-top:4px;">
-        Blink often and rest your eyes!
-      </p>
-      <button id="nextToGame">Next Exercise</button>
-    </div>
-
-    CARD 3: Eye Movement Game
-    <div class="card-side card-second" id="card3" style="display: none;">
-      <div class="mascot">🎯👁️</div> 
-      <h2>Eye Movement Exercise</h2> 
-      <p style="font-size: 14px; margin-bottom: 16px;">
-        Click the circles as they appear!<br>
-        This trains your eye muscles 💪
-      </p>
-      
-      <div id="eyeGameArea" class="eye-game-area">
-        <div id="targetCircle" class="target-circle"></div>
-        <div id="gameScore" class="game-score">0 / 8</div>
-      </div>
-      
-      <button id="startGameBtn" class="game-btn">Start Exercise</button>
-    </div>
-
-    CARD 4: CVS Facts
-    <div class="card-side card-second" id="card4" style="display: none;">
-      <div class="mascot">💡📊</div> 
-      <h2>CVS Quick Facts</h2> 
-      <p>Computer Vision Syndrome affects <strong>60 million people</strong> globally 🌍</p>
-      <p style="font-size: 14px; margin-top: 12px;">
-        Symptoms include: eye strain, headaches, blurred vision, and dry eyes. 
-        Taking regular breaks reduces symptoms by <strong>70%</strong>! ✨
-      </p>
-      <button id="nextToBlink">Continue</button>
-    </div>
-
-    CARD 5: Blink Recharge
-    <div class="card-side card-second" id="blinkCard" style="display: none;">
-      <div class="mascot">👀💧</div>
-      <h2>Blink Recharge</h2>
-      <p>Your eyes got dry 😢<br>Hold the button & blink slowly!</p>
-      <div class="progress-container">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
-      <button id="holdBtn">Hold & Blink 👁️</button>
-    </div>
-
-    CARD 6: Final
-    <div class="card-side card-final" id="doneCard">
-      <div class="mascot">✨🐰</div>
-      <h2>Eyes Refreshed!</h2>
-      <p>Nice blinking! Your eye moisture is restored 💧</p>
-    </div>
-    
-  </div>
-</section> -->
     <section id="mediapipe-demo">
       <div class="blend-shapes">
         <ul class="blend-shapes-list" id="image-blend-shapes"></ul>
       </div>
-
-      <h2>Demo: Webcam continuous face landmarks detection</h2>
-      <p>
-        Hold your face in front of your webcam to get real-time face landmarker detection.</br>
-        Click <b>enable webcam</b> below and grant access to the webcam if prompted.
-      </p>
-
+      <div class="blinkbuddy-title">
+        <h1>BlinkBuddy</h1>
+        <div class="gear-icon"><a href="http://localhost:8000/pages/settings/settings.html"><img src="assets/gear.svg"/></a></div>
+      </div>
       <div id="liveView" class="videoView">
-        <button id="webcamButton" class="mdc-button mdc-button--raised">
-          <span class="mdc-button__ripple"></span>
-          <span class="mdc-button__label">ENABLE WEBCAM</span>
-        </button>
-        <div style="position: relative;">
-          <video id="webcam" autoplay playsinline></video>
-          <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0; top: 0;"></canvas>
+        <div class = "captioned-switch">
+          <span>Camera Detection</span>
+          <label class="switch">
+            <input type="checkbox" id="camToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="camera-container">
+          <div style="position: relative;">
+            <video id="webcam" autoplay playsinline></video>
+            <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0; top: 0;"></canvas>
+          </div>
         </div>
       </div>
 
@@ -140,11 +62,57 @@
         <ul class="blend-shapes-list" id="video-blend-shapes"></ul>
       </div>
 
-      <div style="margin:12px 0; display:flex; gap:8px; flex-wrap:wrap;">
+      <div style="margin:12px 0; display:flex; gap:8px; flex-wrap:wrap; text-align: center; justify-content: center;">
         <button id="start-log">Start logging</button>
         <button id="stop-log" disabled>Stop logging</button>
-        <button id="download-csv" disabled>Download CSV</button>
         <span id="log-status" style="margin:12px 0; display:flex; gap:8px; flex-wrap:wrap;"></span>
+      </div>
+
+      <div class="library">
+        <h2>Library</h2>
+        <div class="top-row">
+          <div class="screen-time card">
+            <div class="eye-icon"><img src="assets/screen-time.svg"/></div>
+              <div class="non-icon">
+                  <div class="title-toggle">
+                      <h3>20-20-20</h3>
+                      <a onclick="openGame('http://localhost:8000/games/20-20-20/20-20-20.html')" class="start-link">start →</a>
+                  </div>
+              </div>
+          </div>  
+          <div class="palming card">
+            <div class="palm-icon"><img src="assets/palm.svg"/></div>
+              <div class="non-icon">
+                  <div class="title-toggle">
+                      <h3>Palming</h3>
+                      <a onclick="openGame('http://localhost:8000/games/palming/palming.html')" class="start-link">start →</a>
+                  </div>
+              </div>
+          </div> 
+        </div>
+        <div class="bottom-row">
+          <div class="eyelid-closure card">
+            <div class="eye-icon"><img src="assets/closed-eye.svg"/></div>
+            <div class="non-icon">
+                <div class="title-toggle">
+                    <h3>Blink Replenish</h3>
+                    <a onclick="openGame('http://localhost:8000/games/tone_blinks/tone_blinks.html')" class="start-link">start →</a>
+                </div>
+            </div>
+          </div>
+          <div class="blink-rate card">
+            <div class="eye-icon"><img src="assets/eye-2.svg"/></div>
+            <div class="non-icon">
+                <div class="title-toggle">
+                    <h3>Lateral Eye Movement</h3>
+                    <a onclick="openGame('http://localhost:8000/games/lateral_movement/lateral_movement.html')" class="start-link">start →</a>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="game-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
+        <iframe id="game-frame" src="" style="width:500px; height:auto; min-height:600px; border:none; border-radius:16px; background:white;"></iframe>
       </div>
     </section>
   </body>

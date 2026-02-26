@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lateral Eye Movement</title>
+    <link rel="stylesheet" href="lateral_movement.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="alert">
+        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <h3>Time for an eye exercise!</h3>
+        <p>Lateral Eye Movements</p>
+        <div class="alert-bar">
+            <div class="img-text-stack">
+                <img src="../../assets/clock.svg"/>
+                <p>20s</p>
+            </div>
+            <div class="img-text-stack">
+                <img src="../../assets/star.svg"/>
+                <p>20 pts</p>
+            </div>
+            <div class="img-text-stack">
+                <img src="../../assets/focus.svg"/>
+                <p>Movement</p>
+            </div>
+        </div>
+        <div class = "instructions">
+            <h4>Instructions:</h4>
+            <ol class="ordered-list">
+                <li>Follow the lateral movement of the blue dot.</li>
+                <li>Continue this exercise until the end of the timer.</li>
+            </ol>
+        </div>
+        <button>Begin Exercise (20s)</button>
+    </div>
+    <div class="exercise">
+        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <h3>Lateral Movement Exercise</h3>
+        <h1 id="timerDisplay">20s</h1>
+        <div class="dot-track">
+            <div class="moving-dot" id="movingDot"></div>
+        </div>
+        <div class="focus-object">
+            <p>Follow the movement of the blue dot with your eyes.</p>
+        </div>
+    </div>
+    <div class="reward">
+        <h3>You've earned 20 points!</h3>
+        <p>Slow side-to-side eye movements help reduce visual fatigue by easing prolonged fixation.</p>
+        <img class = "checkmark" src="../../assets/checkmark.svg"/>
+        <button class = "close-button" onclick="window.parent.closeGame()">Close</button>
+    </div>
+    <script src="lateral_movement.js"></script>
+</body>
+</html>

@@ -10,12 +10,14 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: true,
-      websecurity: false,
+      webSecurity: false,
       media: true
     }
   });
 
-  win.loadFile('settings.html');
+  win.loadURL('http://localhost:8000/pages/welcome/welcome.html');
+  // win.loadURL('index.html');
 }
 
 app.whenReady().then(createWindow);
+

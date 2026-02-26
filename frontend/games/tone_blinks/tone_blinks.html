@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lateral Eye Movement</title>
+    <link rel="stylesheet" href="tone_blinks.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="alert">
+        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <h3>Your eyes might be getting dry.</h3>
+        <p>Restore your tear film through this blinking exercise.</p>
+        <div class="alert-bar">
+            <div class="img-text-stack">
+                <img src="../../assets/clock.svg"/>
+                <p>30s</p>
+            </div>
+            <div class="img-text-stack">
+                <img src="../../assets/star.svg"/>
+                <p>25 pts</p>
+            </div>
+            <div class="img-text-stack">
+                <img src="../../assets/focus.svg"/>
+                <p>Focus</p>
+            </div>
+        </div>
+        <div class = "instructions">
+            <h4>Instructions:</h4>
+            <ol class="ordered-list">
+                <li>When you hear the tone, gently close your eyes completely.</li>
+                <li>Keep your eyes closed until the next tone.</li>
+                <li>When the tone changes, slowly open your eyes.</li>
+                <li>Follow the tones to repeat this blink cycle for 30 seconds.</li>
+            </ol>
+        </div>
+        <button>Begin Exercise (30s)</button>
+    </div>
+    <div class="exercise">
+        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <h3>Blinking Exercise</h3>
+        <h1 id="timerDisplay">30s</h1>
+        <div class="focus-object">
+            <p>Follow the tones to repeat this blink exercise.</p>
+        </div>
+    </div>
+    <div class="reward">
+        <h3>You've earned 25 points!</h3>
+        <p>Complete blinks help restore your tear film and reduce eye dryness.</p>
+        <img class = "checkmark" src="../../assets/checkmark.svg"/>
+        <button class = "close-button" onclick="window.parent.closeGame()">Close</button>
+    </div>
+    <script src="tone_blinks.js"></script>
+</body>
+</html>

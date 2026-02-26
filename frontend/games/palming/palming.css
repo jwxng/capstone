@@ -1,0 +1,164 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.img-text-stack{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.alert-bar{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    justify-content: space-evenly;
+}
+
+.alert, .exercise, .reward{
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-sizing: border-box;
+    width: 472px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.instructions{
+    background-color: #EFF6FF;
+    width: 384px;
+    border-radius: 10px;
+}
+
+button{
+    background-color: #155DFC;
+    color: #ffffff;
+    width: 384px;
+    height: 40px;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    margin: 16px;
+}
+
+ol {
+    counter-reset: item;
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+ol li {
+    counter-increment: item;
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 10px;
+}
+
+ol li::before {
+    content: counter(item) ".";
+    color: #3B82F6;
+    font-weight: bold;
+    position: absolute;
+    left: 12px;
+}
+
+.instructions h4{
+    padding: 8px 16px;
+}
+
+.alert h3{
+    font-weight: 500;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.alert p {
+    color: #4A5565;
+    margin-bottom: 1rem;
+}
+
+.exercise h1{
+    font-size: 3.5rem;
+    font-weight: 400;
+}
+
+.progress-bar-container {
+  width: 70%;
+  background-color: #e0e0e0;
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: #1a1a2e; 
+  border-radius: 999px;
+  transition: width 0.1s linear;
+}
+
+.focus-object {
+    width: 70%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #EFF6FF 0%, #FAF5FF 100%);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.reward {
+    text-align: center;
+}
+
+.reward p {
+    color: #4A5565;
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding: 0 2rem;
+}
+
+.reward h3 {
+    font-weight: 400;
+    font-size: 24px;
+    padding-top: 1rem;
+}
+
+.close-button {
+    background: black;
+    color: white;
+    border-radius: 8px;
+    width: 229px;
+    margin-bottom: 2rem;
+}
+
+.checkmark {
+    margin-top: 2rem;
+}
+
+.exercise {
+  display: none;
+}
+
+.reward {
+  display: none;
+}
+
+.modal-close {
+  align-self: flex-end;
+  background: none;
+  color: #000;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  width: auto;
+  height: auto;
+  margin: 12px 12px 0 0;
+  padding: 0;
+  line-height: 1;
+}

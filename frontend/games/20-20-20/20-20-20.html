@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>20-20-20 Game</title>
+    <link rel="stylesheet" href="20-20-20.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="alert">
+        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <h3>20 minutes have passed! Time for a screen break.</h3>
+        <div class="alert-bar">
+            <div class="img-text-stack">
+                <img src="../../assets/clock.svg"/>
+                <p>20s</p>
+            </div>
+            <div class="img-text-stack">
+                <img src="../../assets/star.svg"/>
+                <p>15 pts</p>
+            </div>
+            <div class="img-text-stack">
+                <img src="../../assets/focus.svg"/>
+                <p>Focus</p>
+            </div>
+        </div>
+        <div class = "instructions">
+            <h4>Instructions:</h4>
+            <ol class="ordered-list">
+                <li>Look at an object ~20 feet away.</li>
+                <li>Focus on it for 20 seconds.</li>
+                <li>Resume your session when done!</li>
+            </ol>
+        </div>
+        <button>Begin Exercise (20s)</button>
+    </div>
+    <div class="exercise">
+        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <h3>20-20-20 Exercise</h3>
+        <h1 id="timerDisplay">20s</h1>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="focus-object">
+            <p>Focus on an object ~20 ft away</p>
+        </div>
+    </div>
+    <div class="reward">
+        <h3>You've earned 15 points!</h3>
+        <p>The 20-20-20 rule reminds you to take regular screen breaks, which can help reduce eye discomfort from prolonged screen use.</p>
+        <img class = "checkmark" src="../../assets/checkmark.svg"/>
+        <button class = "close-button" onclick="window.parent.closeGame()">Close</button>
+    </div>
+    <script src="20-20-20.js"></script>
+</body>
+</html>

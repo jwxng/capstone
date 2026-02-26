@@ -1,6 +1,6 @@
 import vision from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
 const { FaceLandmarker, FilesetResolver, DrawingUtils } = vision;
-const demosSection = document.getElementById("demos");
+// const demosSection = document.getElementById("demos");
 const imageBlendShapes = document.getElementById("image-blend-shapes");
 const videoBlendShapes = document.getElementById("video-blend-shapes");
 
@@ -26,7 +26,7 @@ async function createFaceLandmarker() {
     runningMode,
     numFaces: 1
   });
-  demosSection.classList.remove("invisible");
+  // demosSection.classList.remove("invisible");
 }
 createFaceLandmarker();
 
@@ -146,37 +146,32 @@ function hasGetUserMedia() {
 // If webcam supported, add event listener to button for when user
 // wants to activate it.
 if (hasGetUserMedia()) {
-  enableWebcamButton = document.getElementById("webcamButton");
-  enableWebcamButton.addEventListener("click", enableCam);
+  // enableWebcamButton = document.getElementById("webcamButton");
+  // enableWebcamButton.addEventListener("click", enableCam);
 } else {
   console.warn("getUserMedia() is not supported by your browser");
 }
 
 // Enable the live webcam view and start detection.
-function enableCam(event) {
+function enableCam() {
   if (!faceLandmarker) {
     console.log("Wait! faceLandmarker not loaded yet.");
+    document.getElementById('camToggle').checked = false; // revert toggle
     return;
   }
 
-  if (webcamRunning === true) {
-    webcamRunning = false;
-    enableWebcamButton.innerText = "ENABLE PREDICTIONS";
-  } else {
+  const isChecked = document.getElementById('camToggle').checked;
+  
+  if (isChecked) {
     webcamRunning = true;
-    enableWebcamButton.innerText = "DISABLE PREDICTIONS";
+    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+      video.srcObject = stream;
+      video.addEventListener("loadeddata", predictWebcam);
+    });
+  } else {
+    webcamRunning = false;
+    video.srcObject = null; // turns off camera
   }
-
-  // getUsermedia parameters.
-  const constraints = {
-    video: true
-  };
-
-  // Activate the webcam stream.
-  navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-    video.srcObject = stream;
-    video.addEventListener("loadeddata", predictWebcam);
-  });
 }
 
 let lastVideoTime = -1;
@@ -333,7 +328,6 @@ function startLogging(periodMs = 100) {
   rows.length = 0; // reset
   document.getElementById('start-log').disabled = true;
   document.getElementById('stop-log').disabled = false;
-  document.getElementById('download-csv').disabled = true;
 
   // If we don’t yet have categories, we’ll still start; snapshots will begin once data arrives
   logTimer = setInterval(async () => {
@@ -363,35 +357,23 @@ function stopLogging() {
   logging = false;
   document.getElementById('start-log').disabled = false;
   document.getElementById('stop-log').disabled = true;
-  document.getElementById('download-csv').disabled = rows.length === 0;
 
   eel.data_clear();
-}
-
-function downloadCSV() {
-  if (!header || rows.length === 0) return;
-  // Build CSV text
-  const lines = [];
-  const esc = v => {
-    // Quote if needed
-    const s = String(v);
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  lines.push(header.map(esc).join(','));
-  for (const r of rows) lines.push(r.map(esc).join(','));
-
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `blendshapes_${Date.now()}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(a.href);
 }
 
 // Wire up buttons
 document.getElementById('start-log')?.addEventListener('click', () => startLogging(90));
 document.getElementById('stop-log')?.addEventListener('click', stopLogging);
-document.getElementById('download-csv')?.addEventListener('click', downloadCSV);
+document.getElementById('camToggle').addEventListener('change', enableCam);
 
+function openGame(url) {
+  document.getElementById('game-frame').src = url;
+  document.getElementById('game-modal').style.display = 'flex';
+}
+
+function closeGame() {
+  document.getElementById('game-modal').style.display = 'none';
+  document.getElementById('game-frame').src = '';
+}
+window.openGame = openGame;
+window.closeGame = closeGame;

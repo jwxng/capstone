@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palming Game</title>
+    <link rel="stylesheet" href="palming.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="alert">
+        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <h3>Your blink rate has slowed down.</h3>
+        <p>Try this palming exercise to restore eye moisture.</p>
+        <div class="alert-bar">
+            <div class="img-text-stack">
+                <img src="../../assets/clock.svg"/>
+                <p>20s</p>
+            </div>
+            <div class="img-text-stack">
+                <img src="../../assets/star.svg"/>
+                <p>20 pts</p>
+            </div>
+            <div class="img-text-stack">
+                <img src="../../assets/focus.svg"/>
+                <p>Relaxation</p>
+            </div>
+        </div>
+        <div class = "instructions">
+            <h4>Instructions:</h4>
+            <ol class="ordered-list">
+                <li>Rub your palms together to generate warmth.</li>
+                <li>Cup your palms over closed eyes.</li>
+                <li>Relax in darkness for 1 minute.</li>
+                <li>Breathe deeply throughout.</li>
+            </ol>
+        </div>
+        <button>Begin Exercise (60s)</button>
+    </div>
+    <div class="exercise">
+        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <h3>Palming Exercise</h3>
+        <h1 id="timerDisplay">60s</h1>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="focus-object">
+            <p>Use your palms to cover your eyes. Take deep breaths throughout.</p>
+        </div>
+    </div>
+    <div class="reward">
+        <h3>You've earned 20 points!</h3>
+        <p>Only 15 more points to reach Level 6.</p>
+        <img class = "checkmark" src="../../assets/checkmark.svg"/>
+        <button class = "close-button" onclick="window.parent.closeGame()">Close</button>
+    </div>
+    <script src="palming.js"></script>
+</body>
+</html>

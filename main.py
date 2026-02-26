@@ -5,4 +5,6 @@ from backend.data import data_logging
 eel.init('frontend')
 
 if __name__ == "__main__":
-    start()
+    start.initialization()
+    while True:  # keeps python alive
+        eel.sleep(1.0)
