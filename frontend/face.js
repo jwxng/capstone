@@ -377,3 +377,9 @@ function closeGame() {
 }
 window.openGame = openGame;
 window.closeGame = closeGame;
+
+eel.expose(trigger_game);
+function trigger_game(game) {
+  openGame(`http://localhost:8000/games/${game}`);
+}
+window.trigger_game = trigger_game;

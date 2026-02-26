@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import eel
 from backend.data.alert_tracker import alert_tracker
 from backend.data.data_calibration import data_calibration
 from backend.settings.settings import settings
@@ -83,6 +84,7 @@ def detect_blinks(df, baseline_blink_rate):
     if blink_rate < baseline_blink_rate and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("Blink rate detected to be low; produce alert")
         alert_tracker.data['last_warning'] = df_duration
+        eel.trigger_game('tone_blinks/tone_blinks.html')
 
 
 def calculate_perclos(df):
@@ -134,6 +136,7 @@ def calculate_perclos(df):
     if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("Drowsiness detected; produce alert")
         alert_tracker.data['last_warning'] = df_duration
+        eel.trigger_game('palming/palming.html')
     # print(f"Average PERCLOS: {np.mean(perclos_values):.2f}%")
     # print(f"Minimum PERCLOS: {np.min(perclos_values):.2f}%")
     # print(f"Maximum PERCLOS: {np.max(perclos_values):.2f}%")
