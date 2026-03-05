@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import eel
 from backend.data.alert_tracker import alert_tracker
-from backend.data.data_calibration import data_calibration
+from backend.data.data_calibration import data_calibration, HEAD_TILT_FEATURES, cleaned_series
 from backend.settings.settings import settings
 
 CAMERA_FPS = 60 # can make this dynamic based on camera being used
@@ -40,6 +40,9 @@ def data_analysis(df):
 
     if settings.data["yawning"]:
         detect_yawns(df)
+    
+    if settings.data["head_tilt"]:
+        detect_head_tilt(df)
 
     
 # Main Calculation Functions
@@ -178,6 +181,40 @@ def detect_yawns(df):
     if yawn_count > 5 and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
         print("More than 5 yawns detected; produce alert.")
         alert_tracker.data['last_warning'] = df_duration
+
+def detect_head_tilt(df):
+    baselines = data_calibration.get_head_tilt_baselines()
+    if baselines is None:
+        print("No head tilt calibration data found.")
+        return
+
+    df_start_time = df['timestamp_s'].iloc[0]
+    df_end_time = df['timestamp_s'].iloc[-1]
+    df_duration = df_end_time - df_start_time
+
+    # compute current means for each feature (with outlier removal)
+    current_means = {}
+    for feat in HEAD_TILT_FEATURES:
+        cleaned = cleaned_series(df, feat, k=3.5)
+        if len(cleaned) == 0:
+            return
+        current_means[feat] = float(cleaned.mean())
+
+    # check if ALL features >= forward baseline means
+    matches_forward = all(
+        current_means[f] >= baselines['forward'][f]
+        for f in HEAD_TILT_FEATURES
+    )
+    # check if ALL features >= back baseline means
+    matches_back = all(
+        current_means[f] >= baselines['back'][f]
+        for f in HEAD_TILT_FEATURES
+    )
+
+    if (matches_forward or matches_back) and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+        print("Poor posture detected; produce alert")
+        alert_tracker.data['last_warning'] = df_duration
+        eel.trigger_game('head_tilt/head_tilt.html')
 
 
 # Helper Functions

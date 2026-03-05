@@ -12,6 +12,7 @@ class Settings:
             "perclos": True,
             "yawning": True,
             "screen_time": True,
+            "head_tilt": True,
         }
         self.load_data()
 
