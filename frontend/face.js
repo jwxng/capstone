@@ -156,21 +156,35 @@ if (hasGetUserMedia()) {
 function enableCam() {
   if (!faceLandmarker) {
     console.log("Wait! faceLandmarker not loaded yet.");
-    document.getElementById('camToggle').checked = false; // revert toggle
+    document.getElementById('camToggle').checked = false;
     return;
   }
-
+  
   const isChecked = document.getElementById('camToggle').checked;
   
   if (isChecked) {
     webcamRunning = true;
-    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-      video.srcObject = stream;
-      video.addEventListener("loadeddata", predictWebcam);
+    navigator.mediaDevices.enumerateDevices().then(devices => {
+      const cameras = devices.filter(d => d.kind === 'videoinput');
+
+      if (cameras.length === 0) {
+        console.warn("No camera devices found.");
+        document.getElementById('camToggle').checked = false;
+        return;
+      } 
+
+      const preferred = cameras.find(c => c.label.includes('EMEET')) || cameras[0];
+
+      navigator.mediaDevices.getUserMedia({ 
+        video: preferred.deviceId ? { deviceId: { exact: preferred.deviceId } } : true
+      }).then((stream) => {
+        video.srcObject = stream;
+        video.addEventListener("loadeddata", predictWebcam);
+      });
     });
   } else {
     webcamRunning = false;
-    video.srcObject = null; // turns off camera
+    video.srcObject = null;
   }
 }
 
@@ -179,10 +193,10 @@ let results = undefined;
 const drawingUtils = new DrawingUtils(canvasCtx);
 async function predictWebcam() {
   const radio = video.videoHeight / video.videoWidth;
-  video.style.width = videoWidth + "px";
-  video.style.height = videoWidth * radio + "px";
-  canvasElement.style.width = videoWidth + "px";
-  canvasElement.style.height = videoWidth * radio + "px";
+  // video.style.width = videoWidth + "px";
+  // video.style.height = videoWidth * radio + "px";
+  // canvasElement.style.width = videoWidth + "px";
+  // canvasElement.style.height = videoWidth * radio + "px";
   canvasElement.width = video.videoWidth;
   canvasElement.height = video.videoHeight;
   // Now let's start detecting the stream.
@@ -383,3 +397,11 @@ function trigger_game(game) {
   openGame(`http://localhost:8000/games/${game}`);
 }
 window.trigger_game = trigger_game;
+
+navigator.mediaDevices.enumerateDevices().then(devices => {
+  devices.forEach(device => {
+    if (device.kind === 'videoinput') {
+      console.log(device.label, device.deviceId);
+    }
+  });
+});
