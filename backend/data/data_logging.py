@@ -1,11 +1,10 @@
+import backend.constants
 import eel
 import pandas as pd
 
 from backend.data.data_analysis import data_analysis
 from backend.data.data_calibration import data_calibration
 from backend.data.data_tracker import data_tracker
-
-WORKING_DATA_LENGTH = 6000
 
 @eel.expose
 def data_retrieval(rows, columns):    
@@ -26,7 +25,7 @@ def data_retrieval(rows, columns):
     else:
         data_tracker.working_data = pd.concat([data_tracker.working_data, working_df], ignore_index=True)
         # Remove older entries
-        data_tracker.working_data = data_tracker.working_data.tail(WORKING_DATA_LENGTH)
+        data_tracker.working_data = data_tracker.working_data.tail(backend.constants.WORKING_DATA_LENGTH)
 
     data_tracker.update_current_elapsed_time(data_tracker.working_data['timestamp_s'].iloc[-1])
     

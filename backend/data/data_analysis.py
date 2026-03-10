@@ -1,29 +1,13 @@
+import backend.constants
+import eel
 import numpy as np
 import pandas as pd
-import eel
+
 from backend.data.data_tracker import data_tracker
 from backend.data.data_calibration import data_calibration, HEAD_TILT_FEATURES, cleaned_series
 from backend.settings.settings import settings
 
-CAMERA_FPS = 60 # can make this dynamic based on camera being used
-SECONDS_BETWEEN_WARNINGS = 300
-# Blink Parameters
-BLINK_START_THRESHOLD = 0.6
-BLINK_END_THRESHOLD = 0.3
-BLINK_RATE_LOW_TRIGGER = 15
-# PERCLOS Parameters
-PERCLOS_THRESHOLD = 0.5
-DROWSINESS_THRESHOLD_PERCENTAGE = 15
-MIN_CLOSED_SECONDS = 0.5 
-MAX_CLOSED_SECONDS = 15
-PERCLOS_WINDOW_SECONDS = 60
-# Yawn Parameters
-JAW_OPEN_THRESHOLD = 0.6
-MIN_YAWN_SECONDS = 1.0
-MAX_YAWN_SECONDS = 6.0
-
-# Main Function
-# called by data_logging.py
+# Main Function, called by data_logging.py
 def data_analysis(df):
     print("Analyzing data.")
 
@@ -64,11 +48,11 @@ def detect_blinks(df, baseline_blink_rate):
         curr_time = df['timestamp_s'].iloc[i]
         curr_blink_val = avg_blink.iloc[i]
 
-        if not is_blinking and prev_blink_val <= BLINK_START_THRESHOLD and curr_blink_val > BLINK_START_THRESHOLD:
+        if not is_blinking and prev_blink_val <= backend.constants.BLINK_START_THRESHOLD and curr_blink_val > backend.constants.BLINK_START_THRESHOLD:
             is_blinking = True
             blink_start_time = curr_time
        
-        elif is_blinking and prev_blink_val >= BLINK_END_THRESHOLD and curr_blink_val < BLINK_END_THRESHOLD:
+        elif is_blinking and prev_blink_val >= backend.constants.BLINK_END_THRESHOLD and curr_blink_val < backend.constants.BLINK_END_THRESHOLD:
             is_blinking = False
             blink_end_time = curr_time
             curr_duration = blink_end_time - blink_start_time
@@ -80,7 +64,7 @@ def detect_blinks(df, baseline_blink_rate):
     blink_rate = blink_count / (df_duration / 60)
     print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
 
-    if blink_rate < baseline_blink_rate and data_tracker.current_elapsed_time - data_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
+    if blink_rate < baseline_blink_rate and data_tracker.current_elapsed_time - data_tracker.last_alert_time > backend.constants.SECONDS_BETWEEN_WARNINGS:
         print("Blink rate detected to be low; produce alert")
         data_tracker.last_alert_time = data_tracker.current_elapsed_time
         eel.trigger_game('tone_blinks/tone_blinks.html')()
@@ -88,8 +72,10 @@ def detect_blinks(df, baseline_blink_rate):
 
 def calculate_perclos(df):
     df_start_time = df['timestamp_s'].iloc[0]
+    df_end_time = df['timestamp_s'].iloc[-1]
+    df_duration = df_end_time - df_start_time
     avg_squint = (df['eyeSquintLeft'] + df['eyeSquintRight']) / 2
-    eye_closed = (avg_squint >= PERCLOS_THRESHOLD).astype(int)
+    eye_closed = (avg_squint >= backend.constants.PERCLOS_THRESHOLD).astype(int)
 
     perclos_transitions = np.diff(eye_closed.astype(int))
     perclos_starts = np.where(perclos_transitions == 1)[0] + 1
@@ -104,7 +90,7 @@ def calculate_perclos(df):
         duration = end_time - start_time
         
         # checking if the sequence is valid to be a closure
-        if MIN_CLOSED_SECONDS <= duration <= MAX_CLOSED_SECONDS:
+        if backend.constants.MIN_CLOSED_SECONDS <= duration <= backend.constants.MAX_CLOSED_SECONDS:
             closure_count += 1
             closure_events.append({
                 'start_time': start_time,
@@ -115,7 +101,7 @@ def calculate_perclos(df):
     print(f"Eye Closures detected: {closure_count}")
 
     # calculate PERCLOS percentages
-    iterations_per_sample = CAMERA_FPS
+    iterations_per_sample = max(1, int(len(df) / df_duration))
     perclos_values = []
     perclos_timestamps = []
 
@@ -130,7 +116,7 @@ def calculate_perclos(df):
     # print(f"Calculated {len(perclos_values)} PERCLOS values")
     print(f"Current PERCLOS: {perclos_values[-1]:.2f}%")
 
-    if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and data_tracker.current_elapsed_time - data_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
+    if perclos_values[-1] > backend.constants.DROWSINESS_THRESHOLD_PERCENTAGE and data_tracker.current_elapsed_time - data_tracker.last_alert_time > backend.constants.SECONDS_BETWEEN_WARNINGS:
         print("Drowsiness detected; produce alert")
         data_tracker.last_alert_time = data_tracker.current_elapsed_time
         eel.trigger_game('palming/palming.html')()
@@ -157,19 +143,19 @@ def calculate_perclos(df):
 
 
 def detect_yawns(df):
-    yawn_transitions = np.diff((df['jawOpen'] > JAW_OPEN_THRESHOLD).astype(int))
+    yawn_transitions = np.diff((df['jawOpen'] > backend.constants.JAW_OPEN_THRESHOLD).astype(int))
     yawn_starts = np.where(yawn_transitions == 1)[0] + 1
     yawn_ends = np.where(yawn_transitions == -1)[0] + 1
     yawn_count = 0
 
     for start, end in zip(yawn_starts, yawn_ends):
         duration = df['timestamp_s'].iloc[end] - df['timestamp_s'].iloc[start]
-        if MIN_YAWN_SECONDS <= duration <= MAX_YAWN_SECONDS:
+        if backend.constants.MIN_YAWN_SECONDS <= duration <= backend.constants.MAX_YAWN_SECONDS:
             print(f"ALERT: Yawn lasting {round(duration, 2)}s was Detected!")
             yawn_count += 1
 
     # 5 YAWNS IS ARBITRARY NUMBER, CHANGE LATER BASED ON LITERATURE AND TESTS
-    if yawn_count > 5 and data_tracker.current_elapsed_time - data_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
+    if yawn_count > 5 and data_tracker.current_elapsed_time - data_tracker.last_alert_time > backend.constants.SECONDS_BETWEEN_WARNINGS:
         print("More than 5 yawns detected; produce alert.")
         data_tracker.last_alert_time = data_tracker.current_elapsed_time
 
@@ -198,7 +184,7 @@ def detect_head_tilt(df):
         for f in HEAD_TILT_FEATURES
     )
 
-    if (matches_forward or matches_back) and data_tracker.current_elapsed_time - data_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
+    if (matches_forward or matches_back) and data_tracker.current_elapsed_time - data_tracker.last_alert_time > backend.constants.SECONDS_BETWEEN_WARNINGS:
         print("Poor posture detected; produce alert")
         data_tracker.last_alert_time = data_tracker.current_elapsed_time
         eel.trigger_game('head_tilt/head_tilt.html')()
@@ -206,7 +192,7 @@ def detect_head_tilt(df):
 
 # Helper Functions
 def calculate_perclos_at_time(time_iteration, closure_events):
-    window_start = time_iteration - PERCLOS_WINDOW_SECONDS
+    window_start = time_iteration - backend.constants.PERCLOS_WINDOW_SECONDS
     total_closed_time = 0
     
     for event in closure_events:
@@ -230,7 +216,7 @@ def calculate_perclos_at_time(time_iteration, closure_events):
             total_closed_time += overlap_duration
     
     # calculate actual window size (for when not enough time has passed)
-    actual_window = min(time_iteration, PERCLOS_WINDOW_SECONDS)
+    actual_window = min(time_iteration, backend.constants.PERCLOS_WINDOW_SECONDS)
     
     if actual_window > 0:
         perclos = (total_closed_time / actual_window) * 100
