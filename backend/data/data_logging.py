@@ -1,17 +1,14 @@
 import eel
 import pandas as pd
 
-from backend.data.alert_tracker import alert_tracker
 from backend.data.data_analysis import data_analysis
 from backend.data.data_calibration import data_calibration
+from backend.data.data_tracker import data_tracker
 
 WORKING_DATA_LENGTH = 6000
-working_data = pd.DataFrame()
 
 @eel.expose
-def data_retrieval(rows, columns):
-    global working_data
-    
+def data_retrieval(rows, columns):    
     if not rows or not columns:
         print("No data received.")
         return
@@ -23,29 +20,26 @@ def data_retrieval(rows, columns):
     # create column for timestamps measured in seconds
     working_df['timestamp_s'] = working_df['timestamp_ms'].astype(float) / 1000.0
         
-    if working_data.empty:
-        alert_tracker.session_start_time = working_df['timestamp_s'].iloc[0]
-        working_data = working_df
+    if data_tracker.working_data.empty:
+        data_tracker.session_start_time = working_df['timestamp_s'].iloc[0]
+        data_tracker.working_data = working_df
     else:
-        working_data = pd.concat([working_data, working_df], ignore_index=True)
+        data_tracker.working_data = pd.concat([data_tracker.working_data, working_df], ignore_index=True)
         # Remove older entries
-        working_data = working_data.tail(WORKING_DATA_LENGTH)
+        data_tracker.working_data = data_tracker.working_data.tail(WORKING_DATA_LENGTH)
 
-    alert_tracker.update_current_elapsed_time(working_data['timestamp_s'].iloc[-1])
+    data_tracker.update_current_elapsed_time(data_tracker.working_data['timestamp_s'].iloc[-1])
     
     print("Successfully received data.")
-
+    print(data_tracker.working_data)
     # attempt to save calibration data (only occurs once per session, and when there is no existing data)
-    data_calibration.save_data(working_data)
-
-    data_analysis(working_data)
+    data_calibration.save_data(data_tracker.working_data)
+    # perform analyses
+    data_analysis(data_tracker.working_data)
 
 
 @eel.expose
 def data_clear():
-    global working_data
-
-    working_data = pd.DataFrame()
-    alert_tracker.reset_tracker()
+    data_tracker.reset_tracker()
     print("Memory cleared.")
-    print(working_data)
+    print(data_tracker.working_data)

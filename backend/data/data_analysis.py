@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import eel
-from backend.data.alert_tracker import alert_tracker
+from backend.data.data_tracker import data_tracker
 from backend.data.data_calibration import data_calibration, HEAD_TILT_FEATURES, cleaned_series
 from backend.settings.settings import settings
 
@@ -80,9 +80,9 @@ def detect_blinks(df, baseline_blink_rate):
     blink_rate = blink_count / (df_duration / 60)
     print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
 
-    if blink_rate < baseline_blink_rate and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
+    if blink_rate < baseline_blink_rate and data_tracker.current_elapsed_time - data_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Blink rate detected to be low; produce alert")
-        alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
+        data_tracker.last_alert_time = data_tracker.current_elapsed_time
         eel.trigger_game('tone_blinks/tone_blinks.html')()
 
 
@@ -130,9 +130,9 @@ def calculate_perclos(df):
     # print(f"Calculated {len(perclos_values)} PERCLOS values")
     print(f"Current PERCLOS: {perclos_values[-1]:.2f}%")
 
-    if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
+    if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and data_tracker.current_elapsed_time - data_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Drowsiness detected; produce alert")
-        alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
+        data_tracker.last_alert_time = data_tracker.current_elapsed_time
         eel.trigger_game('palming/palming.html')()
     # print(f"Average PERCLOS: {np.mean(perclos_values):.2f}%")
     # print(f"Minimum PERCLOS: {np.min(perclos_values):.2f}%")
@@ -169,9 +169,9 @@ def detect_yawns(df):
             yawn_count += 1
 
     # 5 YAWNS IS ARBITRARY NUMBER, CHANGE LATER BASED ON LITERATURE AND TESTS
-    if yawn_count > 5 and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
+    if yawn_count > 5 and data_tracker.current_elapsed_time - data_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("More than 5 yawns detected; produce alert.")
-        alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
+        data_tracker.last_alert_time = data_tracker.current_elapsed_time
 
 def detect_head_tilt(df):
     baselines = data_calibration.get_head_tilt_baselines()
@@ -198,9 +198,9 @@ def detect_head_tilt(df):
         for f in HEAD_TILT_FEATURES
     )
 
-    if (matches_forward or matches_back) and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
+    if (matches_forward or matches_back) and data_tracker.current_elapsed_time - data_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Poor posture detected; produce alert")
-        alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
+        data_tracker.last_alert_time = data_tracker.current_elapsed_time
         eel.trigger_game('head_tilt/head_tilt.html')()
 
 

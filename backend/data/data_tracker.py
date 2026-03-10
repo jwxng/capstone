@@ -1,5 +1,8 @@
-class AlertTracker:
+import pandas as pd
+
+class DataTracker:
     def __init__(self):
+        self.working_data = pd.DataFrame()
         self.session_start_time = None
         self.current_elapsed_time = 0
         self.last_alert_time = 0
@@ -11,7 +14,9 @@ class AlertTracker:
         self.last_alert_time = new_time
 
     def reset_tracker(self):
+        self.working_data = pd.DataFrame()
         self.session_start_time = None
+        self.current_elapsed_time = 0
         self.last_alert_time = 0
 
-alert_tracker = AlertTracker()
+data_tracker = DataTracker()
