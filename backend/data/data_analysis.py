@@ -26,7 +26,7 @@ MAX_YAWN_SECONDS = 6.0
 # called by data_logging.py
 def data_analysis(df):
     print("Analyzing data.")
-    
+
     if settings.data['blink_rate']:
         #get the baseline from the calibration file
         baseline_blink_rate = data_calibration.get_baseline()
@@ -80,20 +80,14 @@ def detect_blinks(df, baseline_blink_rate):
     blink_rate = blink_count / (df_duration / 60)
     print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
 
-    # if blink_rate < BLINK_RATE_LOW_TRIGGER and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
-    #     print("WARNING: Blink rate was detected to be very low.")
-    #     alert_tracker.data['last_warning'] = df_duration
-
-    if blink_rate < baseline_blink_rate and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if blink_rate < baseline_blink_rate and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Blink rate detected to be low; produce alert")
-        alert_tracker.data['last_warning'] = df_duration
+        alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
         eel.trigger_game('tone_blinks/tone_blinks.html')
 
 
 def calculate_perclos(df):
     df_start_time = df['timestamp_s'].iloc[0]
-    df_end_time = df['timestamp_s'].iloc[-1]
-    df_duration = df_end_time - df_start_time
     avg_squint = (df['eyeSquintLeft'] + df['eyeSquintRight']) / 2
     eye_closed = (avg_squint >= PERCLOS_THRESHOLD).astype(int)
 
@@ -136,9 +130,9 @@ def calculate_perclos(df):
     # print(f"Calculated {len(perclos_values)} PERCLOS values")
     print(f"Current PERCLOS: {perclos_values[-1]:.2f}%")
 
-    if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Drowsiness detected; produce alert")
-        alert_tracker.data['last_warning'] = df_duration
+        alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
         eel.trigger_game('palming/palming.html')
     # print(f"Average PERCLOS: {np.mean(perclos_values):.2f}%")
     # print(f"Minimum PERCLOS: {np.min(perclos_values):.2f}%")
@@ -163,9 +157,6 @@ def calculate_perclos(df):
 
 
 def detect_yawns(df):
-    df_start_time = df['timestamp_s'].iloc[0]
-    df_end_time = df['timestamp_s'].iloc[-1]
-    df_duration = df_end_time - df_start_time
     yawn_transitions = np.diff((df['jawOpen'] > JAW_OPEN_THRESHOLD).astype(int))
     yawn_starts = np.where(yawn_transitions == 1)[0] + 1
     yawn_ends = np.where(yawn_transitions == -1)[0] + 1
@@ -178,19 +169,15 @@ def detect_yawns(df):
             yawn_count += 1
 
     # 5 YAWNS IS ARBITRARY NUMBER, CHANGE LATER BASED ON LITERATURE AND TESTS
-    if yawn_count > 5 and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if yawn_count > 5 and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("More than 5 yawns detected; produce alert.")
-        alert_tracker.data['last_warning'] = df_duration
+        alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
 
 def detect_head_tilt(df):
     baselines = data_calibration.get_head_tilt_baselines()
     if baselines is None:
         print("No head tilt calibration data found.")
         return
-
-    df_start_time = df['timestamp_s'].iloc[0]
-    df_end_time = df['timestamp_s'].iloc[-1]
-    df_duration = df_end_time - df_start_time
 
     # compute current means for each feature (with outlier removal)
     current_means = {}
@@ -211,9 +198,9 @@ def detect_head_tilt(df):
         for f in HEAD_TILT_FEATURES
     )
 
-    if (matches_forward or matches_back) and df_duration - alert_tracker.data['last_warning'] > SECONDS_BETWEEN_WARNINGS:
+    if (matches_forward or matches_back) and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Poor posture detected; produce alert")
-        alert_tracker.data['last_warning'] = df_duration
+        alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
         eel.trigger_game('head_tilt/head_tilt.html')
 
 
