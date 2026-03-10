@@ -1,5 +1,4 @@
 import backend.constants
-import eel
 import numpy as np
 import pandas as pd
 
@@ -162,8 +161,8 @@ def detect_yawns(df):
 
     # 5 YAWNS IS ARBITRARY NUMBER, CHANGE LATER BASED ON LITERATURE AND TESTS
     if yawn_count > 5:
-        print("More than 5 yawns detected.")
-        print("Frontend alert for yawns is not ready. This print statement serves as a placeholder.")
+        print("More than 5 yawns detected. (FRONTEND NOT READY YET)")
+
 
 def detect_head_tilt(df):
     baselines = data_calibration.get_head_tilt_baselines()
