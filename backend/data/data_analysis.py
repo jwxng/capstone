@@ -83,7 +83,7 @@ def detect_blinks(df, baseline_blink_rate):
     if blink_rate < baseline_blink_rate and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Blink rate detected to be low; produce alert")
         alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
-        eel.trigger_game('tone_blinks/tone_blinks.html')
+        eel.trigger_game('tone_blinks/tone_blinks.html')()
 
 
 def calculate_perclos(df):
@@ -133,7 +133,7 @@ def calculate_perclos(df):
     if perclos_values[-1] > DROWSINESS_THRESHOLD_PERCENTAGE and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Drowsiness detected; produce alert")
         alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
-        eel.trigger_game('palming/palming.html')
+        eel.trigger_game('palming/palming.html')()
     # print(f"Average PERCLOS: {np.mean(perclos_values):.2f}%")
     # print(f"Minimum PERCLOS: {np.min(perclos_values):.2f}%")
     # print(f"Maximum PERCLOS: {np.max(perclos_values):.2f}%")
@@ -201,7 +201,7 @@ def detect_head_tilt(df):
     if (matches_forward or matches_back) and alert_tracker.current_elapsed_time - alert_tracker.last_alert_time > SECONDS_BETWEEN_WARNINGS:
         print("Poor posture detected; produce alert")
         alert_tracker.last_alert_time = alert_tracker.current_elapsed_time
-        eel.trigger_game('head_tilt/head_tilt.html')
+        eel.trigger_game('head_tilt/head_tilt.html')()
 
 
 # Helper Functions

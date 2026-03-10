@@ -25,7 +25,7 @@ def start_screen_time_timer():
         while True:
             time.sleep(1200)  # 20 minutes
             print("20 minutes passed; triggering 20-20-20")
-            eel.trigger_game('20-20-20/20-20-20.html')
+            eel.trigger_game('20-20-20/20-20-20.html')()
     
     thread = threading.Thread(target=timer_loop, daemon=True)
     thread.start()
