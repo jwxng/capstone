@@ -30,7 +30,6 @@ def data_retrieval(rows, columns):
     data_tracker.update_current_elapsed_time(data_tracker.working_data['timestamp_s'].iloc[-1])
     
     print("Successfully received data.")
-    print(data_tracker.working_data)
     # attempt to save calibration data (only occurs once per session, and when there is no existing data)
     data_calibration.save_data(data_tracker.working_data)
     # perform analyses
@@ -41,4 +40,3 @@ def data_retrieval(rows, columns):
 def data_clear():
     data_tracker.reset_tracker()
     print("Memory cleared.")
-    print(data_tracker.working_data)
