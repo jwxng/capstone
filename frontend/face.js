@@ -345,6 +345,7 @@ function startLogging(periodMs = 100) {
   document.getElementById('stop-log').disabled = false;
 
   // If we don’t yet have categories, we’ll still start; snapshots will begin once data arrives
+  let current_batch = [];
   logTimer = setInterval(async () => {
     const row = snapshotRow();
     
@@ -354,10 +355,8 @@ function startLogging(periodMs = 100) {
     if (status) status.textContent = `logged rows: ${rows.length}`;
 
     // Send to backend in batches
-    let current_batch = [];
     if (row && header) {
-      const row = snapshotRow();
-      await eel.data_retrieval(row, header);
+      current_batch.push(row);
 
       if (current_batch.length >= batchLength) {
         await eel.data_retrieval(current_batch, header);

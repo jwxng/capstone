@@ -16,7 +16,9 @@ def data_retrieval(rows, columns):
         print("No data received.")
         return
 
-    rows = [rows]
+    if not isinstance(rows[0], list):
+        rows = [rows]
+        
     working_df = pd.DataFrame(rows, columns=columns)
     # create column for timestamps measured in seconds
     working_df['timestamp_s'] = working_df['timestamp_ms'].astype(float) / 1000.0
