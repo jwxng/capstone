@@ -9,6 +9,7 @@ let runningMode = "IMAGE";
 let enableWebcamButton;
 let webcamRunning = false;
 const videoWidth = 480;
+const batchLength = 10;
 
 // Before we can use HandLandmarker class we must wait for it to finish
 // loading. Machine Learning models can be large and take a moment to
@@ -352,9 +353,16 @@ function startLogging(periodMs = 100) {
     const status = document.getElementById('log-status');
     if (status) status.textContent = `logged rows: ${rows.length}`;
 
-    // If valid data available, send it to backend
+    // Send to backend in batches
+    let current_batch = [];
     if (row && header) {
+      const row = snapshotRow();
       await eel.data_retrieval(row, header);
+
+      if (current_batch.length >= batchLength) {
+        await eel.data_retrieval(current_batch, header);
+        current_batch = [];
+      }
       
       const status = document.getElementById('log-status');
       if (status) {
