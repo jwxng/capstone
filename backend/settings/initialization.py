@@ -4,11 +4,7 @@ import threading
 import time
 
 def initialization():
-    if not user_settings.data["terms_agreed"]:
-        print("Await user agreeing to terms.")
-        eel.start("pages/welcome/welcome.html", mode=None, block=False)
-    else:
-        eel.start("index.html", mode=None, block=False)
+    eel.start("index.html", mode=None, block=False)
 
 @eel.expose
 def terms_agreed():
