@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 
 from backend.data.data_tracker import data_tracker
-from backend.data.data_calibration import data_calibration, HEAD_TILT_FEATURES, cleaned_series
+from backend.data.blink_rate_calibration import blink_rate_calibration
+from backend.data.head_tilt_calibration import head_tilt_calibration, HEAD_TILT_FEATURES, cleaned_series
 from backend.settings.settings import settings
 
 # Main Function, called by data_logging.py
@@ -13,7 +14,7 @@ def data_analysis(df):
 
     if settings.data['blink_rate']:
         # get the baseline from the calibration file
-        baseline_blink_rate = data_calibration.get_baseline()
+        baseline_blink_rate = blink_rate_calibration.get_baseline()
 
         if baseline_blink_rate != -1:
             # use baseline to compare
@@ -169,7 +170,7 @@ def detect_yawns(df):
 
 
 def detect_head_tilt(df):
-    baselines = data_calibration.get_head_tilt_baselines()
+    baselines = head_tilt_calibration.get_head_tilt_baselines()
     if baselines is None:
         print("No head tilt calibration data found.")
         return

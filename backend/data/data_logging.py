@@ -3,7 +3,7 @@ import eel
 import pandas as pd
 
 from backend.data.data_analysis import data_analysis
-from backend.data.data_calibration import data_calibration
+from backend.data.blink_rate_calibration import blink_rate_calibration
 from backend.data.data_tracker import data_tracker
 
 @eel.expose
@@ -31,7 +31,7 @@ def data_retrieval(rows, columns):
     
     print("Successfully received data.")
     # attempt to save calibration data (only occurs once per session, and when there is no existing data)
-    data_calibration.save_data(data_tracker.working_data)
+    blink_rate_calibration.save_data(data_tracker.working_data)
     # perform analyses
     data_analysis(data_tracker.working_data)
 
