@@ -111,3 +111,10 @@ button:hover{
     transform: scale(1.05);
     transition: all 0.3s ease-in-out;
 }
+
+.switch { position: relative; display: inline-block; width: 64px; height: 28px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; inset: 0; background: #ccc; border-radius: 100px; transition: .3s; padding: 2px; }
+.slider::before { content: ""; position: absolute; width: 24px; height: 24px; left: 2px; bottom: 2px; background: white; border-radius: 50%; transition: .3s; }
+input:checked + .slider { background: #34C759; }
+input:checked + .slider::before { transform: translateX(36px); }

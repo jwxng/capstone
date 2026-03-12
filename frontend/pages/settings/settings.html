@@ -13,10 +13,6 @@
         <h2>Settings</h2>
     </div>
     <div class="content">
-        <div class = "cam-detection">
-            <h3>Camera Detection</h3>
-            <div class="toggle-icon"><img src="../../assets/toggle.svg"/></div>
-        </div>
         <div class = "notifications">
             <h3>Notifications</h3>
             <div class="top-row">
@@ -25,7 +21,10 @@
                     <div class="non-icon">
                         <div class="title-toggle">
                             <h3>Blink Rate</h3>
-                            <div class="toggle-icon"><img src="../../assets/toggle.svg"/></div>
+                            <label class="switch">
+                                <input type="checkbox" id="blinkToggle">
+                                <span class="slider"></span>
+                            </label>
                         </div>
                         <div class="text">
                             <p>Enable gamified eye exercises when your blink rate deviates from your baseline</p>
@@ -37,7 +36,10 @@
                     <div class="non-icon">
                         <div class="title-toggle">
                             <h3>Eyelid Closure</h3>
-                            <div class="toggle-icon"><img src="../../assets/toggle.svg"/></div>
+                            <label class="switch">
+                                <input type="checkbox" id="eyelidToggle">
+                                <span class="slider"></span>
+                            </label>
                         </div>
                         <div class="text">
                             <p>Get gamified eye exercises when your PERCLOS metrics deviate from your baseline</p>
@@ -50,11 +52,14 @@
                     <div class="yawn-icon"><img src="../../assets/yawn.svg"/></div>
                     <div class="non-icon">
                         <div class="title-toggle">
-                            <h3>Yawning</h3>
-                            <div class="toggle-icon"><img src="../../assets/toggle.svg"/></div>
+                            <h3>Head Tilt</h3>
+                            <label class="switch">
+                                <input type="checkbox" id="tiltToggle">
+                                <span class="slider"></span>
+                            </label>
                         </div>
                         <div class="text">
-                            <p>Get gamified eye exercises when you yawn more than your hourly average.</p>
+                            <p>Get gamified eye exercises when your head tilt angle induces fatigue.</p>
                         </div>
                     </div>
                 </div>
@@ -63,7 +68,10 @@
                     <div class="non-icon">
                         <div class="title-toggle">
                             <h3>Screen Time</h3>
-                            <div class="toggle-icon"><img src="../../assets/toggle.svg"/></div>
+                            <label class="switch">
+                                <input type="checkbox" id="screenToggle">
+                                <span class="slider"></span>
+                            </label>
                         </div>
                         <div class="text">
                             <p>Get notified when you have not taken a break</p>
@@ -79,6 +87,25 @@
 async function goHome() {
   window.location.replace('http://localhost:8000/index.html');
 }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', async () => {
+    const settings = await eel.get_settings()();
+    document.getElementById('blinkToggle').checked  = settings.blink_rate ?? true;
+    document.getElementById('eyelidToggle').checked = settings.perclos ?? true;
+    document.getElementById('tiltToggle').checked   = settings.head_tilt ?? true;
+    document.getElementById('screenToggle').checked = settings.screen_time ?? true;
+  });
+
+  async function goHome() {
+    await eel.save_settings({
+      blink_rate:    document.getElementById('blinkToggle').checked,
+      perclos:        document.getElementById('eyelidToggle').checked,
+      head_tilt:     document.getElementById('tiltToggle').checked,
+      screen_time:   document.getElementById('screenToggle').checked,
+    })();
+    window.location.replace('http://localhost:8000/index.html');
+  }
 </script>
 </body>
 </html>
