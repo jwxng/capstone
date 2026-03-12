@@ -23,9 +23,6 @@ def data_analysis(df):
     if settings.data["perclos"]:
         calculate_perclos(df)
 
-    if settings.data["yawning"]:
-        detect_yawns(df)
-    
     if settings.data["head_tilt"]:
         detect_head_tilt(df)
 
@@ -150,23 +147,6 @@ def calculate_perclos(df):
     # print("---------|-----------")
     # for i in range(0, min(len(perclos_timestamps), 10)):
     #     print(f"{perclos_timestamps[i]:8.2f} | {perclos_values[i]:7.2f}%")
-
-
-def detect_yawns(df):
-    yawn_transitions = np.diff((df['jawOpen'] > backend.constants.JAW_OPEN_THRESHOLD).astype(int))
-    yawn_starts = np.where(yawn_transitions == 1)[0] + 1
-    yawn_ends = np.where(yawn_transitions == -1)[0] + 1
-    yawn_count = 0
-
-    for start, end in zip(yawn_starts, yawn_ends):
-        duration = df['timestamp_s'].iloc[end] - df['timestamp_s'].iloc[start]
-        if backend.constants.MIN_YAWN_SECONDS <= duration <= backend.constants.MAX_YAWN_SECONDS:
-            print(f"ALERT: Yawn lasting {round(duration, 2)}s was Detected!")
-            yawn_count += 1
-
-    # 5 YAWNS IS ARBITRARY NUMBER, CHANGE LATER BASED ON LITERATURE AND TESTS
-    if yawn_count > 5:
-        print("More than 5 yawns detected. (FRONTEND NOT READY YET)")
 
 
 def detect_head_tilt(df):

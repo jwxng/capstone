@@ -10,7 +10,6 @@ class Settings:
             # exercises enabled by default
             "blink_rate": True,
             "perclos": True,
-            "yawning": True,
             "head_tilt": True,
             "screen_time": True,
         }
