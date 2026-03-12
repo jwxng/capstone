@@ -8,11 +8,11 @@ class Settings:
         self.data = {
             "terms_agreed": False,
             # exercises enabled by default
-            "screen_time": True,
-            "perclos": True,
             "blink_rate": True,
+            "perclos": True,
             "yawning": True,
             "head_tilt": True,
+            "screen_time": True,
         }
         self.load_data()
 

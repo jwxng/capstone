@@ -8,10 +8,8 @@ from backend.settings.settings import settings
 
 # Main Function, called by data_logging.py
 def data_analysis(df):
+    # df is data_tracker.working_data
     print("Analyzing data.")
-
-    if settings.data["perclos"]:
-        calculate_perclos(df)
 
     if settings.data['blink_rate']:
         # get the baseline from the calibration file
@@ -21,14 +19,62 @@ def data_analysis(df):
             # use baseline to compare
             detect_blinks(df, baseline_blink_rate)
 
+    if settings.data["perclos"]:
+        calculate_perclos(df)
+
     if settings.data["yawning"]:
         detect_yawns(df)
     
     if settings.data["head_tilt"]:
         detect_head_tilt(df)
 
+    if settings.data["screen_time"]:
+        data_tracker.check_screen_time()
+
     
 # Main Calculation Functions
+def detect_blinks(df, baseline_blink_rate):
+    df_start_time = df['timestamp_s'].iloc[0]
+    df_end_time = df['timestamp_s'].iloc[-1]
+    df_duration = df_end_time - df_start_time
+
+    if data_tracker.current_elapsed_time < backend.constants.BLINK_STARTUP_BUFFER_SECONDS:
+        return
+
+    avg_blink = (df['eyeBlinkLeft'] + df['eyeBlinkRight']) / 2
+    blink_count = 0
+    total_blinking_time = 0
+
+    is_blinking = False
+    blink_start_time = None
+    blink_end_time = None
+    prev_blink_val = avg_blink[0]
+
+    for i in range(len(avg_blink)):
+        curr_time = df['timestamp_s'].iloc[i]
+        curr_blink_val = avg_blink.iloc[i]
+
+        if not is_blinking and prev_blink_val <= backend.constants.BLINK_START_THRESHOLD and curr_blink_val > backend.constants.BLINK_START_THRESHOLD:
+            is_blinking = True
+            blink_start_time = curr_time
+       
+        elif is_blinking and prev_blink_val >= backend.constants.BLINK_END_THRESHOLD and curr_blink_val < backend.constants.BLINK_END_THRESHOLD:
+            is_blinking = False
+            blink_end_time = curr_time
+            curr_duration = blink_end_time - blink_start_time
+            total_blinking_time += curr_duration
+            blink_count += 1
+
+        prev_blink_val = curr_blink_val
+
+    blink_rate = blink_count / (df_duration / 60)
+    print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
+
+    if blink_rate < baseline_blink_rate:
+        print("Blink rate detected to be low.")
+        data_tracker.try_triggering_alert('tone_blinks/tone_blinks.html')
+
+
 def calculate_perclos(df):
     df_start_time = df['timestamp_s'].iloc[0]
     df_end_time = df['timestamp_s'].iloc[-1]
@@ -103,48 +149,6 @@ def calculate_perclos(df):
     # print("---------|-----------")
     # for i in range(0, min(len(perclos_timestamps), 10)):
     #     print(f"{perclos_timestamps[i]:8.2f} | {perclos_values[i]:7.2f}%")
-
-
-def detect_blinks(df, baseline_blink_rate):
-    df_start_time = df['timestamp_s'].iloc[0]
-    df_end_time = df['timestamp_s'].iloc[-1]
-    df_duration = df_end_time - df_start_time
-
-    if data_tracker.current_elapsed_time < backend.constants.BLINK_STARTUP_BUFFER_SECONDS:
-        return
-
-    avg_blink = (df['eyeBlinkLeft'] + df['eyeBlinkRight']) / 2
-    blink_count = 0
-    total_blinking_time = 0
-
-    is_blinking = False
-    blink_start_time = None
-    blink_end_time = None
-    prev_blink_val = avg_blink[0]
-
-    for i in range(len(avg_blink)):
-        curr_time = df['timestamp_s'].iloc[i]
-        curr_blink_val = avg_blink.iloc[i]
-
-        if not is_blinking and prev_blink_val <= backend.constants.BLINK_START_THRESHOLD and curr_blink_val > backend.constants.BLINK_START_THRESHOLD:
-            is_blinking = True
-            blink_start_time = curr_time
-       
-        elif is_blinking and prev_blink_val >= backend.constants.BLINK_END_THRESHOLD and curr_blink_val < backend.constants.BLINK_END_THRESHOLD:
-            is_blinking = False
-            blink_end_time = curr_time
-            curr_duration = blink_end_time - blink_start_time
-            total_blinking_time += curr_duration
-            blink_count += 1
-
-        prev_blink_val = curr_blink_val
-
-    blink_rate = blink_count / (df_duration / 60)
-    print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
-
-    if blink_rate < baseline_blink_rate:
-        print("Blink rate detected to be low.")
-        data_tracker.try_triggering_alert('tone_blinks/tone_blinks.html')
 
 
 def detect_yawns(df):
