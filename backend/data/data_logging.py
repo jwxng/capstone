@@ -2,8 +2,9 @@ import backend.constants
 import eel
 import pandas as pd
 
-from backend.data.data_analysis import data_analysis
 from backend.data.blink_rate_calibration import blink_rate_calibration
+from backend.data.compliance import check_compliance
+from backend.data.data_analysis import data_analysis
 from backend.data.data_tracker import data_tracker
 
 @eel.expose
@@ -30,10 +31,11 @@ def data_retrieval(rows, columns):
     data_tracker.update_current_elapsed_time(data_tracker.working_data['timestamp_s'].iloc[-1])
     
     print("Successfully received data.")
-    # attempt to save calibration data (only occurs once per session, and when there is no existing data)
+    # attempt to save blink calibration data (only occurs once per session, and when there is no existing data)
     blink_rate_calibration.save_data(data_tracker.working_data)
     # perform analyses
     data_analysis(data_tracker.working_data)
+    check_compliance(data_tracker.working_data)
 
 
 @eel.expose

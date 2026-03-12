@@ -395,6 +395,10 @@ function openGame(url) {
 function closeGame() {
   document.getElementById('game-modal').style.display = 'none';
   document.getElementById('game-frame').src = '';
+  
+  if (window.eel) {
+      window.eel.clear_active_exercise()();
+  }
 }
 window.openGame = openGame;
 window.closeGame = closeGame;

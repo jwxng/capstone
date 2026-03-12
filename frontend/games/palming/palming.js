@@ -1,6 +1,9 @@
 let timerInterval = null;
 
 function startExercise() {
+    if (window.parent && window.parent.eel) {
+        window.parent.eel.set_active_exercise('palming')();
+    }
     const progressBar = document.getElementById('progressBar');
     const timerDisplay = document.getElementById('timerDisplay');
     
@@ -20,9 +23,12 @@ function startExercise() {
         progressBar.style.width = (elapsed / duration * 100) + '%';
 
         if (elapsed >= duration) {
-        clearInterval(timerInterval);
-        document.querySelector('.exercise').style.display = 'none';
-        document.querySelector('.reward').style.display = 'flex';
+            clearInterval(timerInterval);
+            if (window.parent && window.parent.eel) {
+                window.parent.eel.clear_active_exercise()();
+            }
+            document.querySelector('.exercise').style.display = 'none';
+            document.querySelector('.reward').style.display = 'flex';
         }
     }, 100);
 }

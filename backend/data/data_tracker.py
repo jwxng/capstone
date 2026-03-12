@@ -9,6 +9,9 @@ class DataTracker:
         self.current_elapsed_time = 0
         self.last_alert_time = 0
         self.screen_time_threshold = backend.constants.SCREEN_TIME_THRESHOLD_SECONDS
+
+        self.active_exercise = None 
+        self.exercise_start_time = 0
     
     def update_current_elapsed_time(self, new_time):
         self.current_elapsed_time = new_time - self.session_start_time
@@ -30,5 +33,9 @@ class DataTracker:
         self.session_start_time = None
         self.current_elapsed_time = 0
         self.last_alert_time = 0
+        self.screen_time_threshold = backend.constants.SCREEN_TIME_THRESHOLD_SECONDS
+
+        self.active_exercise = None
+        self.exercise_start_time = 0
 
 data_tracker = DataTracker()
