@@ -1,3 +1,8 @@
+# --- compliance.py constants ---
+COMPLIANCE_PERCENTAGE = 0.9
+LOOKING_AWAY_THRESHOLD = 0.5
+TWENTY_RULE = 20
+
 # --- data_analysis.py constants ---
 SECONDS_BETWEEN_WARNINGS = 300
 # Blink Parameters

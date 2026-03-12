@@ -25,7 +25,7 @@ function startExercise() {
         if (elapsed >= duration) {
             clearInterval(timerInterval);
             if (window.parent && window.parent.eel) {
-                window.parent.eel.clear_active_exercise()();
+                window.parent.eel.finish_exercise('20-20-20')();
             }
             document.querySelector('.exercise').style.display = 'none';
             document.querySelector('.reward').style.display = 'flex';

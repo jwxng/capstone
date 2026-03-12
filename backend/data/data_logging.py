@@ -35,7 +35,6 @@ def data_retrieval(rows, columns):
     blink_rate_calibration.save_data(data_tracker.working_data)
     # perform analyses
     data_analysis(data_tracker.working_data)
-    check_compliance(data_tracker.working_data)
 
 
 @eel.expose
