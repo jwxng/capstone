@@ -14,7 +14,7 @@ function startExercise() {
     });
 
     let elapsed = 0;
-    const duration = 60000;
+    const duration = 30000;
 
     timerInterval = setInterval(() => {
         elapsed += 100;
