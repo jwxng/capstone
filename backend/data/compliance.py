@@ -30,28 +30,40 @@ def check_compliance():
     if data_tracker.active_exercise == "palming":
         if run_palming_algorithm(df):
             print("Palming compliance achieved!")
-            data_tracker.active_exercise = None # comment this out later
         else:
             print("Palming compliance not achieved, please repeat")
             
     elif data_tracker.active_exercise == "20-20-20":
         if run_20_20_20_algorithm(df):
             print("20-20-20 compliance achieved!")
-            data_tracker.active_exercise = None # comment this out later
         else:
             print("20-20-20 compliance not achieved, please repeat")
 
+
 def run_palming_algorithm(df):
-    # TODO: Implement your logic
-    return True 
+    df_exercise = df[df['timestamp_s'] >= data_tracker.exercise_start_time]
+
+    if df_exercise.empty:
+        return False
+    
+    df_features = df_exercise.drop(columns=['timestamp_ms', 'timestamp_s'], errors='ignore')
+
+    row_changes = df_features.diff().abs()
+
+    is_frozen = (row_changes < backend.constants.PALMING_TOLERANCE).all(axis=1).fillna(True)
+    print(is_frozen)
+
+    if is_frozen.mean() >= backend.constants.COMPLIANCE_PERCENTAGE:
+        return True
+    
+    return False
+
 
 def run_20_20_20_algorithm(df):
     """
     detect if a user is looking away
     if either value > 0.5, then they are looking away
     """
-    # break_start = None
-
     df_exercise = df[df['timestamp_s'] >= data_tracker.exercise_start_time]
 
     if df_exercise.empty:
@@ -66,25 +78,3 @@ def run_20_20_20_algorithm(df):
         return False
     
     return True
-
-    # for i in range(len(df)):
-    #     current_time = df['timestamp_s'].iloc[i]
-
-    #     if current_time < exercise_start_time:
-    #         continue
-    
-
-    #     # if the user is complying and is looking away
-    #     if looking_away:
-    #         if break_start is None:
-    #             break_start = current_time
-
-    #         if current_time - break_start >= backend.constants.TWENTY_RULE:
-    #             return True
-
-    #     # user is not complying
-    #     else:
-    #         # restart the process since the user looked back
-    #         if break_start is not None:
-    #             print("Please look away for 20s")
-    #             break_start = None
