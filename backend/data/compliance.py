@@ -12,8 +12,9 @@ def set_active_exercise(exercise_name):
 @eel.expose
 def finish_exercise(exercise_name):
     print(f"Finishing compliance tracking for: {exercise_name}")
-    check_compliance()
+    result = check_compliance()
     clear_active_exercise()
+    return result 
 
 @eel.expose
 def clear_active_exercise():
@@ -25,20 +26,22 @@ def check_compliance():
     df = data_tracker.working_data
     # only runs when an exercise is active
     if not data_tracker.active_exercise:
-        return
+        return False
 
     if data_tracker.active_exercise == "palming":
         if run_palming_algorithm(df):
             print("Palming compliance achieved!")
+            return True
         else:
             print("Palming compliance not achieved, please repeat")
-            
+            return False
     elif data_tracker.active_exercise == "20-20-20":
         if run_20_20_20_algorithm(df):
             print("20-20-20 compliance achieved!")
+            return True
         else:
             print("20-20-20 compliance not achieved, please repeat")
-
+            return False
 
 def run_palming_algorithm(df):
     df_exercise = df[df['timestamp_s'] >= data_tracker.exercise_start_time]

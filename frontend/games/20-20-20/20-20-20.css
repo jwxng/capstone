@@ -156,3 +156,14 @@ ol li::before {
   padding: 0;
   line-height: 1;
 }
+
+.compliance-failed-prompt{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-sizing: border-box;
+    width: 472px;
+    margin-bottom: 2rem;
+}
