@@ -1,4 +1,17 @@
 let timerInterval = null;
+let endToneTimeout = null;
+function playTone(frequency, duration) {
+  const ctx = new AudioContext();
+  const oscillator = ctx.createOscillator();
+  const gainNode = ctx.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(ctx.destination);
+  oscillator.frequency.value = frequency;
+  oscillator.start();
+  gainNode.gain.setValueAtTime(1.0, ctx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+  oscillator.stop(ctx.currentTime + duration);
+}
 
 async function startExercise() {
     if (window.parent && window.parent.eel) {
@@ -18,6 +31,10 @@ async function startExercise() {
 
     let elapsed = 0;
     const duration = 20000;
+
+    playTone(520, 1.0);                          
+
+    endToneTimeout = setTimeout(() => playTone(380, 1.0), 20000);
 
     timerInterval = setInterval(async () => {
         elapsed += 100;
