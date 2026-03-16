@@ -6,6 +6,7 @@ from backend.data.data_tracker import data_tracker
 from backend.data.blink_rate_calibration import blink_rate_calibration
 from backend.data.head_tilt_calibration import head_tilt_calibration, HEAD_TILT_FEATURES, cleaned_series
 from backend.settings.settings import settings
+from scipy.ndimage import gaussian_filter1d
 
 # Main Function, called by data_logging.py
 def data_analysis(df):
@@ -74,79 +75,66 @@ def detect_blinks(df, baseline_blink_rate):
 
 
 def calculate_perclos(df):
-    df_start_time = df['timestamp_s'].iloc[0]
-    df_end_time = df['timestamp_s'].iloc[-1]
-    df_duration = df_end_time - df_start_time
-
     if data_tracker.current_elapsed_time < backend.constants.PERCLOS_WINDOW_SECONDS:
         return
 
     avg_squint = (df['eyeSquintLeft'] + df['eyeSquintRight']) / 2
-    eye_closed = (avg_squint >= backend.constants.PERCLOS_THRESHOLD).astype(int)
 
-    perclos_transitions = np.diff(eye_closed.astype(int))
-    perclos_starts = np.where(perclos_transitions == 1)[0] + 1
-    perclos_ends = np.where(perclos_transitions == -1)[0] + 1
+    # Soft threshold ramp: 0 at p50 (eyes relaxed/open) → 1 at p95 (eyes near-closed)
+    soft_low  = np.percentile(avg_squint, 50)   # starts counting here
+    soft_high = np.percentile(avg_squint, 95)   # fully closed here
 
-    closure_events = []
-    closure_count = 0
+    # Continuous closure score: 0 = open, 1 = fully closed
+    closure_score = np.clip(
+        (avg_squint.values - soft_low) / (soft_high - soft_low),
+        0, 1
+    )
 
-    for start, end in zip(perclos_starts, perclos_ends):
-        start_time = df['timestamp_s'].iloc[start]
-        end_time = df['timestamp_s'].iloc[end]
-        duration = end_time - start_time
-        
-        # checking if the sequence is valid to be a closure
-        if backend.constants.MIN_CLOSED_SECONDS <= duration <= backend.constants.MAX_CLOSED_SECONDS:
-            closure_count += 1
-            closure_events.append({
-                'start_time': start_time,
-                'end_time': end_time,
-                'duration': duration
-            })
+    times = df['timestamp_s'].values
+    perclos_values = np.zeros(len(times))
 
-    print(f"Eye Closures detected: {closure_count}")
+    for i in range(len(times)):
+        t_now   = times[i]
+        t_start = t_now - backend.constants.PERCLOS_WINDOW_SECONDS
 
-    # calculate PERCLOS percentages
-    iterations_per_sample = max(1, int(len(df) / df_duration))
-    perclos_values = []
-    perclos_timestamps = []
+        # All frames inside the rolling window
+        mask = (times >= t_start) & (times <= t_now)
+        wt = times[mask]
+        wc = closure_score[mask]
 
-    print("Calculating PERCLOS percentages...")
-    for i in range(0, len(avg_squint), iterations_per_sample):
-        time_iteration = df['timestamp_s'].iloc[i] - df_start_time
-        perclos = calculate_perclos_at_time(time_iteration, closure_events)
-        
-        perclos_values.append(perclos)
-        perclos_timestamps.append(time_iteration)
+        if len(wt) < 2:
+            perclos_values[i] = backend.constants.FLOOR_PERCENTAGE
+            continue
 
-    # print(f"Calculated {len(perclos_values)} PERCLOS values")
-    print(f"Current PERCLOS: {perclos_values[-1]:.2f}%")
+        # Trapezoidal integration: time-weighted closure fraction
+        dt  = np.diff(wt)
+        mid = (wc[:-1] + wc[1:]) / 2
+        closed_time   = np.sum(dt * mid)
+        actual_window = wt[-1] - wt[0]
 
-    if perclos_values[-1] > backend.constants.DROWSINESS_THRESHOLD_PERCENTAGE:
-        print("Drowsiness detected.")
+        raw = (closed_time / actual_window) * 100 if actual_window > 0 else 0.0
+
+        # Apply physiological floor
+        perclos_values[i] = max(raw, backend.constants.FLOOR_PERCENTAGE)
+
+    # Gaussian smoothing — preserves peaks/valleys, removes frame jitter
+    perclos_smooth = gaussian_filter1d(perclos_values, sigma=backend.constants.SMOOTH_SIGMA)
+    perclos_smooth = np.maximum(perclos_smooth, backend.constants.FLOOR_PERCENTAGE)
+
+    current_perclos = perclos_smooth[-1]
+
+    if current_perclos < backend.constants.DROWSINESS_THRESHOLD_PERCENTAGE:
+        status = "ALERT"
+    elif current_perclos < backend.constants.VERY_DROWSINESS_THRESHOLD_PERCENTAGE:
+        status = "DROWSY"
+    else:
+        status = "VERY DROWSY"
+
+    print(f"Current PERCLOS : {current_perclos:.2f}%")
+    print(f"Current Status  : {status}")
+
+    if current_perclos > backend.constants.DROWSINESS_THRESHOLD_PERCENTAGE:
         data_tracker.try_triggering_alert('palming/palming.html')
-        
-    # print(f"Average PERCLOS: {np.mean(perclos_values):.2f}%")
-    # print(f"Minimum PERCLOS: {np.min(perclos_values):.2f}%")
-    # print(f"Maximum PERCLOS: {np.max(perclos_values):.2f}%")
-
-    # classifying drowsiness
-    # current_perclos = perclos_values[-1]
-    # if current_perclos < 15:
-    #     status = "ALERT"
-    # elif current_perclos < 35:
-    #     status = "DROWSY"
-    # else:
-    #     status = "VERY DROWSY"
-    # print(f"Current Status: {status}")
-
-    # # Show sample PERCLOS values
-    # print("Sample PERCLOS Values:")
-    # print("Time (s) | PERCLOS (%)")
-    # print("---------|-----------")
-    # for i in range(0, min(len(perclos_timestamps), 10)):
-    #     print(f"{perclos_timestamps[i]:8.2f} | {perclos_values[i]:7.2f}%")
 
 
 def detect_head_tilt(df):

@@ -1,5 +1,6 @@
 import backend.constants
 import eel
+import numpy as np
 
 from backend.data.data_tracker import data_tracker
 
@@ -56,7 +57,7 @@ def run_palming_algorithm(df):
     is_frozen = (row_changes < backend.constants.PALMING_TOLERANCE).all(axis=1).fillna(True)
     print(is_frozen)
 
-    if is_frozen.mean() >= backend.constants.COMPLIANCE_PERCENTAGE:
+    if is_frozen.mean() >= backend.constants.PALMING_COMPLIANCE_THRESHOLD:
         return True
     
     return False
@@ -64,20 +65,29 @@ def run_palming_algorithm(df):
 
 def run_20_20_20_algorithm(df):
     """
-    detect if a user is looking away
-    if either value > 0.5, then they are looking away
+    20-20-20 compliance would be based on looking at either end of the screen
+    (eyeLookOutLeft, eyeLookOutRight)
+    if either value > LOOKING_AWAY_THRESHOLD, the user is considered looking away.
+    evaluates the entire df as the 20s game window — pass in only the
+    data collected during the game session.
     """
     df_exercise = df[df['timestamp_s'] >= data_tracker.exercise_start_time]
-
-    if df_exercise.empty:
+    if len(df_exercise) < backend.constants.TWENTY_MINIMUM_ROWS:
         return False
-    
+
+    times = df_exercise['timestamp_s'].values
     looking_away = (
-        (df_exercise['eyeLookOutLeft'] > backend.constants.LOOKING_AWAY_THRESHOLD) |
+        (df_exercise['eyeLookOutLeft']  > backend.constants.LOOKING_AWAY_THRESHOLD) |
         (df_exercise['eyeLookOutRight'] > backend.constants.LOOKING_AWAY_THRESHOLD)
-    )
+    ).astype(int).values
 
-    if looking_away.mean() <= backend.constants.COMPLIANCE_PERCENTAGE:
-        return False
-    
-    return True
+    # trapezoidal integration over the full window
+    dt             = np.diff(times)
+    mid            = (looking_away[:-1] + looking_away[1:]) / 2
+    time_away      = np.sum(dt * mid)
+    actual_window  = times[-1] - times[0]
+
+    compliance_pct = (time_away / actual_window) * 100 if actual_window > 0 else 0.0
+    is_compliant   = compliance_pct >= backend.constants.TWENTY_COMPLIANCE_THRESHOLD * 100
+
+    return is_compliant
