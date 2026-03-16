@@ -12,6 +12,7 @@ class Settings:
             "perclos": True,
             "head_tilt": True,
             "screen_time": True,
+            "points": 0,
         }
         self.load_data()
 
