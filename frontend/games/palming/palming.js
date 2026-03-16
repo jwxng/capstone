@@ -21,7 +21,7 @@ async function startExercise() {
     const timerDisplay = document.getElementById('timerDisplay');
 
     progressBar.style.width = '0%';
-    timerDisplay.textContent = '20s';
+    timerDisplay.textContent = '30s';
     
     document.querySelector('.alert').style.display = 'none';
     document.querySelector('.exercise').style.display = 'flex';
