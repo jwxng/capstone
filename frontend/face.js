@@ -390,6 +390,10 @@ document.getElementById('camToggle').addEventListener('change', enableCam);
 function openGame(url) {
   document.getElementById('game-frame').src = url;
   document.getElementById('game-modal').style.display = 'flex';
+
+  if (window.eel) {
+      window.eel.open_exercise()();
+  }
 }
 
 function closeGame() {
@@ -398,6 +402,7 @@ function closeGame() {
   
   if (window.eel) {
       window.eel.clear_active_exercise()();
+      window.eel.close_exercise()();
   }
 }
 window.openGame = openGame;
