@@ -24,8 +24,8 @@ def data_analysis(df):
     if settings.data["perclos"]:
         calculate_perclos(df)
 
-    if settings.data["head_tilt"]:
-        detect_head_tilt(df)
+    # if settings.data["head_tilt"]:
+    #     detect_head_tilt(df)
 
     if settings.data["screen_time"]:
         data_tracker.check_screen_time()
@@ -137,67 +137,67 @@ def calculate_perclos(df):
         data_tracker.try_triggering_alert('palming/palming.html')
 
 
-def detect_head_tilt(df):
-    baselines = head_tilt_calibration.get_head_tilt_baselines()
-    if baselines is None:
-        print("No head tilt calibration data found.")
-        return
+# def detect_head_tilt(df):
+#     baselines = head_tilt_calibration.get_head_tilt_baselines()
+#     if baselines is None:
+#         print("No head tilt calibration data found.")
+#         return
 
-    # compute current means for each feature (with outlier removal)
-    current_means = {}
-    for feat in HEAD_TILT_FEATURES:
-        cleaned = cleaned_series(df, feat, k=3.5)
-        if len(cleaned) == 0:
-            return
-        current_means[feat] = float(cleaned.mean())
+#     # compute current means for each feature (with outlier removal)
+#     current_means = {}
+#     for feat in HEAD_TILT_FEATURES:
+#         cleaned = cleaned_series(df, feat, k=3.5)
+#         if len(cleaned) == 0:
+#             return
+#         current_means[feat] = float(cleaned.mean())
 
-    # check if ALL features >= forward baseline means
-    matches_forward = all(
-        current_means[f] >= baselines['forward'][f]
-        for f in HEAD_TILT_FEATURES
-    )
-    # check if ALL features >= back baseline means
-    matches_back = all(
-        current_means[f] >= baselines['back'][f]
-        for f in HEAD_TILT_FEATURES
-    )
+#     # check if ALL features >= forward baseline means
+#     matches_forward = all(
+#         current_means[f] >= baselines['forward'][f]
+#         for f in HEAD_TILT_FEATURES
+#     )
+#     # check if ALL features >= back baseline means
+#     matches_back = all(
+#         current_means[f] >= baselines['back'][f]
+#         for f in HEAD_TILT_FEATURES
+#     )
 
-    if matches_forward or matches_back:
-        print("Poor posture detected.")
-        data_tracker.try_triggering_alert('head_tilt/head_tilt.html')
+#     if matches_forward or matches_back:
+#         print("Poor posture detected.")
+#         data_tracker.try_triggering_alert('head_tilt/head_tilt.html')
 
 
 # Helper Functions
-def calculate_perclos_at_time(time_iteration, closure_events):
-    window_start = time_iteration - backend.constants.PERCLOS_WINDOW_SECONDS
-    total_closed_time = 0
+# def calculate_perclos_at_time(time_iteration, closure_events):
+#     window_start = time_iteration - backend.constants.PERCLOS_WINDOW_SECONDS
+#     total_closed_time = 0
     
-    for event in closure_events:
-        event_start = event['start_time']
-        event_end = event['end_time']
+#     for event in closure_events:
+#         event_start = event['start_time']
+#         event_end = event['end_time']
         
-        # if event is fully before window, ignore
-        if event_end < window_start:
-            continue
+#         # if event is fully before window, ignore
+#         if event_end < window_start:
+#             continue
         
-        # if event is fully after current time, ignore
-        if event_start > time_iteration:
-            continue
+#         # if event is fully after current time, ignore
+#         if event_start > time_iteration:
+#             continue
         
-        # calculate overlapping time with window
-        overlap_start = max(event_start, window_start)
-        overlap_end = min(event_end, time_iteration)
-        overlap_duration = overlap_end - overlap_start
+#         # calculate overlapping time with window
+#         overlap_start = max(event_start, window_start)
+#         overlap_end = min(event_end, time_iteration)
+#         overlap_duration = overlap_end - overlap_start
         
-        if overlap_duration > 0:
-            total_closed_time += overlap_duration
+#         if overlap_duration > 0:
+#             total_closed_time += overlap_duration
     
-    # calculate actual window size (for when not enough time has passed)
-    actual_window = min(time_iteration, backend.constants.PERCLOS_WINDOW_SECONDS)
+#     # calculate actual window size (for when not enough time has passed)
+#     actual_window = min(time_iteration, backend.constants.PERCLOS_WINDOW_SECONDS)
     
-    if actual_window > 0:
-        perclos = (total_closed_time / actual_window) * 100
-    else:
-        perclos = 0
+#     if actual_window > 0:
+#         perclos = (total_closed_time / actual_window) * 100
+#     else:
+#         perclos = 0
     
-    return perclos
+#     return perclos
