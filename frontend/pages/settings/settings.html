@@ -99,10 +99,10 @@ async function goHome() {
 
   async function goHome() {
     await eel.save_settings({
-      blink_rate:    document.getElementById('blinkToggle').checked,
-      perclos:        document.getElementById('eyelidToggle').checked,
-      head_tilt:     document.getElementById('tiltToggle').checked,
-      screen_time:   document.getElementById('screenToggle').checked,
+      blink_rate: document.getElementById('blinkToggle').checked,
+      perclos: document.getElementById('eyelidToggle').checked,
+      head_tilt: document.getElementById('tiltToggle').checked,
+      screen_time: document.getElementById('screenToggle').checked,
     })();
     window.location.replace('http://localhost:8000/index.html');
   }
