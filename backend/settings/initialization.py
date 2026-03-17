@@ -19,7 +19,6 @@ def get_settings():
     return {
         "blink_rate": user_settings.data.get("blink_rate", True),
         "perclos": user_settings.data.get("perclos", True),
-        "head_tilt": user_settings.data.get("head_tilt", True),
         "screen_time": user_settings.data.get("screen_time", True),
     }
 
@@ -27,7 +26,6 @@ def get_settings():
 def save_settings(data):
     user_settings.data["blink_rate"] = data.get("blink_rate", True)
     user_settings.data["perclos"] = data.get("perclos", True)
-    user_settings.data["head_tilt"] = data.get("head_tilt", True)
     user_settings.data["screen_time"] = data.get("screen_time", True)
     user_settings.save_data()
 

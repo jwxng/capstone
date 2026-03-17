@@ -118,3 +118,12 @@ button:hover{
 .slider::before { content: ""; position: absolute; width: 24px; height: 24px; left: 2px; bottom: 2px; background: white; border-radius: 50%; transition: .3s; }
 input:checked + .slider { background: #34C759; }
 input:checked + .slider::before { transform: translateX(36px); }
+
+.screen-time.card {
+  width: 600px;
+  box-sizing: border-box;
+}
+
+.card {
+  box-sizing: border-box; 
+}

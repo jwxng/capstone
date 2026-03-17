@@ -48,21 +48,6 @@
                 </div>
             </div>
             <div class="bottom-row">
-                <div class="yawning card">
-                    <div class="yawn-icon"><img src="../../assets/yawn.svg"/></div>
-                    <div class="non-icon">
-                        <div class="title-toggle">
-                            <h3>Head Tilt</h3>
-                            <label class="switch">
-                                <input type="checkbox" id="tiltToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="text">
-                            <p>Get gamified eye exercises when your head tilt angle induces fatigue.</p>
-                        </div>
-                    </div>
-                </div>
                 <div class="screen-time card">
                     <div class="eye-icon"><img src="../../assets/screen-time.svg"/></div>
                     <div class="non-icon">
@@ -93,7 +78,6 @@ async function goHome() {
     const settings = await eel.get_settings()();
     document.getElementById('blinkToggle').checked  = settings.blink_rate ?? true;
     document.getElementById('eyelidToggle').checked = settings.perclos ?? true;
-    document.getElementById('tiltToggle').checked   = settings.head_tilt ?? true;
     document.getElementById('screenToggle').checked = settings.screen_time ?? true;
   });
 
@@ -101,7 +85,6 @@ async function goHome() {
     await eel.save_settings({
       blink_rate: document.getElementById('blinkToggle').checked,
       perclos: document.getElementById('eyelidToggle').checked,
-      head_tilt: document.getElementById('tiltToggle').checked,
       screen_time: document.getElementById('screenToggle').checked,
     })();
     window.location.replace('http://localhost:8000/index.html');
