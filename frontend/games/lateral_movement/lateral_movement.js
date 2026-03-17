@@ -23,6 +23,9 @@ function startExercise() {
         clearInterval(timerInterval);
         document.querySelector('.exercise').style.display = 'none';
         document.querySelector('.reward').style.display = 'flex';
+        window.parent.eel.add_points(20)(function(newTotal) { 
+            window.parent.updatePoints(newTotal);
+        });
         }
     }, 100);
 }

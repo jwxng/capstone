@@ -49,6 +49,8 @@ async function startExercise() {
                 document.querySelector('.exercise').style.display = 'none';
                 if (compliant) {
                     document.querySelector('.reward').style.display = 'flex';
+                    const newTotal = await window.parent.eel.add_points(15)();
+                    window.parent.updatePoints(newTotal);
                 } else {
                     document.querySelector('.compliance-failed-prompt').style.display = 'flex';
                 }

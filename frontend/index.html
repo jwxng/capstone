@@ -43,12 +43,18 @@
         <div class="gear-icon"><a href="http://localhost:8000/pages/settings/settings.html"><img src="assets/gear.svg"/></a></div>
       </div>
       <div id="liveView" class="videoView">
-        <div class = "captioned-switch">
-          <span>Camera Detection</span>
-          <label class="switch">
-            <input type="checkbox" id="camToggle">
-            <span class="slider"></span>
-          </label>
+        <div class = "information-row">
+          <div class = "captioned-switch">
+            <span>Camera Detection</span>
+            <label class="switch">
+              <input type="checkbox" id="camToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class = "points-tally">
+            <img src="assets/trophy.svg"/>
+            <p>0</p>
+          </div>
         </div>
         <div class="camera-container">
           <div style="position: relative;">
@@ -115,5 +121,13 @@
         <iframe id="game-frame" src="" style="width:500px; height:auto; min-height:600px; border:none; border-radius:16px; background:white;"></iframe>
       </div>
     </section>
+    <script>
+      function updatePoints(total) {
+        document.querySelector('.points-tally p').textContent = total;
+      }
+      eel.get_points()(function(total) {
+        document.querySelector('.points-tally p').textContent = total;
+      });
+    </script>
   </body>
 </html>

@@ -30,3 +30,13 @@ def save_settings(data):
     user_settings.data["head_tilt"] = data.get("head_tilt", True)
     user_settings.data["screen_time"] = data.get("screen_time", True)
     user_settings.save_data()
+
+@eel.expose
+def get_points():
+    return user_settings.data["points"]
+
+@eel.expose
+def add_points(amount):
+    user_settings.data["points"] += amount
+    user_settings.save_data()
+    return user_settings.data["points"]

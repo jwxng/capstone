@@ -357,7 +357,7 @@ input:checked + .slider::before { transform: translateX(36px); }
   margin-bottom: 12px;
 }
 
-.captioned-switch span {
+.captioned-switch span, .points-tally p {
   font-weight: 400; 
   font-size: 25px;
 }
@@ -401,4 +401,18 @@ input:checked + .slider::before { transform: translateX(36px); }
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.information-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.points-tally {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
