@@ -15,15 +15,53 @@
     </div>
     <div class="action-section">
         <button id="agree-button" onclick="handle_agreed()">Get started</button>
-        <p>By continuing, you agree to our privacy policy.</p>
+        <p>By continuing, you agree to our <a href="#" id="privacy-link">privacy policy</a>.</p>
     </div>
 
     <script type="text/javascript" src="/eel.js"></script>
+    <div id="privacy-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <h3>Privacy Policy</h3>
+            <div class="modal-body">
+                <p><em>Last updated: March 17, 2026</em></p>
+                <h4>1. Overview</h4>
+                <p>BlinkBuddy is a desktop application that monitors eye health metrics using your device's webcam. All data stays local and private.</p>
+                <h4>2. Data We Collect</h4>
+                <p>Webcam frames (processed in real-time, never stored or transmitted), eye health metrics (blink rate, PERCLOS, screen time, head tilt), calibration data, and user settings — all stored locally on your device.</p>
+                <h4>3. Webcam Access</h4>
+                <p>Webcam access is used solely for real-time facial landmark detection. No images or video are saved.</p>
+                <h4>4. Biometric Data</h4>
+                <p>All facial geometry data is processed in memory only and never transmitted externally.</p>
+                <h4>5. Third-Party Services</h4>
+                <p>BlinkBuddy does not integrate with any third-party analytics, advertising, or data brokers.</p>
+                <h4>6. Contact</h4>
+                <p>For questions, contact the BlinkBuddy development team.</p>
+            </div>
+            <div class="footer">
+                &copy; 2026 BlinkBuddy Project. All rights reserved.
+            </div>
+            <button id="close-bottom">Close</button>
+        </div>
+    </div>
     <script>
         async function handle_agreed() {
             await eel.terms_agreed()(); 
             window.location.href = "http://localhost:8000/index.html";
         }
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('privacy-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('privacy-modal').style.display = 'flex';
+            });
+            document.getElementById('close-bottom').addEventListener('click', () => {
+                document.getElementById('privacy-modal').style.display = 'none';
+            });
+            document.getElementById('privacy-modal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('privacy-modal')) {
+                document.getElementById('privacy-modal').style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>

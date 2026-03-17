@@ -41,3 +41,76 @@ button:hover{
     transform: scale(1.05);
     transition: all 0.3s ease-in-out;
 }
+
+#privacy-link {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 500px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.modal-header button {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #444;
+  text-align: left;
+}
+
+.modal-body h4 {
+  margin: 12px 0 4px;
+  font-weight: 600;
+  color: #111;
+}
+
+#close-bottom {
+  align-self: flex-end;
+  padding: 8px 20px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
