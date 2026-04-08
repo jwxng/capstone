@@ -388,23 +388,48 @@ document.getElementById('stop-log')?.addEventListener('click', stopLogging);
 document.getElementById('camToggle').addEventListener('change', enableCam);
 
 function openGame(url) {
-  document.getElementById('game-frame').src = url;
-  document.getElementById('game-modal').style.display = 'flex';
-
-  if (window.eel) {
-      window.eel.open_exercise()();
+  // Use Electron popup instead of iframe modal
+  if (window.electronAPI) {
+    window.electronAPI.openGamePopup(url);
+  } else {
+    // Fallback: iframe modal (for dev/browser testing)
+    document.getElementById('game-frame').src = url;
+    document.getElementById('game-modal').style.display = 'flex';
   }
-}
+ 
+  if (window.eel) {
+    window.eel.open_exercise()();
+  }
+} 
 
 function closeGame() {
-  document.getElementById('game-modal').style.display = 'none';
-  document.getElementById('game-frame').src = '';
-  
+  if (window.electronAPI) {
+    window.electronAPI.closeGamePopup();
+  } else {
+    document.getElementById('game-modal').style.display = 'none';
+    document.getElementById('game-frame').src = '';
+  }
+ 
   if (window.eel) {
-      window.eel.clear_active_exercise()();
-      window.eel.close_exercise()();
+    window.eel.clear_active_exercise()();
+    window.eel.close_exercise()();
   }
 }
+
+// Listen for when the popup is closed (via X button in the game)
+// so we can notify Eel that the exercise ended
+if (window.electronAPI) {
+  window.electronAPI.onGameClosed(() => {
+    if (window.eel) {
+      window.eel.clear_active_exercise()();
+      window.eel.close_exercise()();
+    }
+  });
+  window.electronAPI.onPointsUpdated((total) => {
+    document.querySelector('.points-tally p').textContent = total;
+  });
+}
+
 window.openGame = openGame;
 window.closeGame = closeGame;
 
@@ -413,11 +438,3 @@ function trigger_game(game) {
   openGame(`http://localhost:8000/games/${game}`);
 }
 window.trigger_game = trigger_game;
-
-navigator.mediaDevices.enumerateDevices().then(devices => {
-  devices.forEach(device => {
-    if (device.kind === 'videoinput') {
-      console.log(device.label, device.deviceId);
-    }
-  });
-});

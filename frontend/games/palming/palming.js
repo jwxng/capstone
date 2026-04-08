@@ -14,8 +14,8 @@ function playTone(frequency, duration) {
 }
 
 async function startExercise() {
-    if (window.parent && window.parent.eel) {
-        window.parent.eel.set_active_exercise('palming')();
+    if (window.parent && eel) {
+        eel.set_active_exercise('palming')();
     }
     const progressBar = document.getElementById('progressBar');
     const timerDisplay = document.getElementById('timerDisplay');
@@ -44,13 +44,13 @@ async function startExercise() {
 
         if (elapsed >= duration) {
             clearInterval(timerInterval);
-            if (window.parent && window.parent.eel) {
-                const compliant = await window.parent.eel.finish_exercise('palming')(); 
+            if (window.parent && eel) {
+                const compliant = await eel.finish_exercise('palming')(); 
                 document.querySelector('.exercise').style.display = 'none';
                 if (compliant) {
                     document.querySelector('.reward').style.display = 'flex';
-                    const newTotal = await window.parent.eel.add_points(20)();
-                    window.parent.updatePoints(newTotal);
+                    const newTotal = await eel.add_points(20)();
+                    if (window.electronAPI) window.electronAPI.updatePoints(newTotal);
                 } else {
                     document.querySelector('.compliance-failed-prompt').style.display = 'flex';
                 }

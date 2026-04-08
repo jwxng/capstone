@@ -6,10 +6,11 @@
     <title>Lateral Eye Movement</title>
     <link rel="stylesheet" href="tone_blinks.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="/eel.js"></script>
 </head>
 <body>
     <div class="alert">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <h3>Your eyes might be getting dry.</h3>
         <p>Restore your tear film through this blinking exercise.</p>
         <div class="alert-bar">
@@ -38,7 +39,7 @@
         <button>Begin Exercise (30s)</button>
     </div>
     <div class="exercise">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <h3>Blinking Exercise</h3>
         <h1 id="timerDisplay">30s</h1>
         <div class="focus-object">
@@ -49,8 +50,17 @@
         <h3>You've earned 25 points!</h3>
         <p>Complete blinks help restore your tear film and reduce eye dryness.</p>
         <img class = "checkmark" src="../../assets/checkmark.svg"/>
-        <button class = "close-button" onclick="window.parent.closeGame()">Close</button>
+        <button class = "close-button" onclick="closeThisGame()">Close</button>
     </div>
     <script src="tone_blinks.js"></script>
+    <script>
+    function closeThisGame() {
+        if (window.electronAPI) {
+            window.electronAPI.closeGamePopup();
+        } else if (window.parent && window.parent.closeGame) {
+            window.parent.closeGame();
+        }
+    }
+    </script>
 </body>
 </html>

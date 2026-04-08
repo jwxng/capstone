@@ -6,10 +6,11 @@
     <title>Lateral Eye Movement</title>
     <link rel="stylesheet" href="lateral_movement.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="/eel.js"></script>
 </head>
 <body>
     <div class="alert">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <h3>Time for an eye exercise!</h3>
         <p>Lateral Eye Movements</p>
         <div class="alert-bar">
@@ -36,7 +37,7 @@
         <button>Begin Exercise (20s)</button>
     </div>
     <div class="exercise">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <h3>Lateral Movement Exercise</h3>
         <h1 id="timerDisplay">20s</h1>
         <div class="dot-track">
@@ -50,8 +51,17 @@
         <h3>You've earned 20 points!</h3>
         <p>Slow side-to-side eye movements help reduce visual fatigue by easing prolonged fixation.</p>
         <img class = "checkmark" src="../../assets/checkmark.svg"/>
-        <button class = "close-button" onclick="window.parent.closeGame()">Close</button>
+        <button class = "close-button" onclick="closeThisGame()">Close</button>
     </div>
     <script src="lateral_movement.js"></script>
+    <script>
+    function closeThisGame() {
+        if (window.electronAPI) {
+            window.electronAPI.closeGamePopup();
+        } else if (window.parent && window.parent.closeGame) {
+            window.parent.closeGame();
+        }
+    }
+    </script>
 </body>
 </html>

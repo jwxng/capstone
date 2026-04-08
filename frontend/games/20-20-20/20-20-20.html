@@ -6,10 +6,11 @@
     <title>20-20-20 Game</title>
     <link rel="stylesheet" href="20-20-20.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="/eel.js"></script>
 </head>
 <body>
     <div class="alert">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <h3>20 minutes have passed! Time for a screen break.</h3>
         <div class="alert-bar">
             <div class="img-text-stack">
@@ -28,7 +29,7 @@
         <div class = "instructions">
             <h4>Instructions:</h4>
             <ol class="ordered-list">
-                <li>Look at an object ~20 feet away.</li>
+                <li>Look at the left or right frame around your screen (the border not the display).</li>
                 <li>Focus on it for 20 seconds.</li>
                 <li>Resume your session when done!</li>
             </ol>
@@ -36,7 +37,7 @@
         <button>Begin Exercise (20s)</button>
     </div>
     <div class="exercise">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <h3>20-20-20 Exercise</h3>
         <h1 id="timerDisplay">20s</h1>
         <div class="progress-bar-container">
@@ -47,7 +48,7 @@
         </div>
     </div>
     <div class="compliance-failed-prompt" style="display:none">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <img class = "warning" src="../../assets/warning.svg"/>
         <p>You have not yet completed the 20-20-20 exercise!</p>
         <button>Resume exercise</button>
@@ -56,8 +57,17 @@
         <h3>You've earned 15 points!</h3>
         <p>The 20-20-20 rule reminds you to take regular screen breaks, which can help reduce eye discomfort from prolonged screen use.</p>
         <img class = "checkmark" src="../../assets/checkmark.svg"/>
-        <button class = "close-button" onclick="window.parent.closeGame()">Close</button>
+        <button class = "close-button" onclick="closeThisGame()">Close</button>
     </div>
+    <script>
+    function closeThisGame() {
+        if (window.electronAPI) {
+            window.electronAPI.closeGamePopup();
+        } else if (window.parent && window.parent.closeGame) {
+            window.parent.closeGame();
+        }
+    }
+    </script>
     <script src="20-20-20.js"></script>
 </body>
 </html>

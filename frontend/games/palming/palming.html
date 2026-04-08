@@ -6,10 +6,11 @@
     <title>Palming Game</title>
     <link rel="stylesheet" href="palming.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="/eel.js"></script>
 </head>
 <body>
     <div class="alert">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <h3>You seem tired.</h3>
         <p>Try this palming exercise to relax your ocular muscles.</p>
         <div class="alert-bar">
@@ -38,7 +39,7 @@
         <button>Begin Exercise (30s)</button>
     </div>
     <div class="exercise">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <h3>Palming Exercise</h3>
         <h1 id="timerDisplay">30s</h1>
         <div class="progress-bar-container">
@@ -49,7 +50,7 @@
         </div>
     </div>
     <div class="compliance-failed-prompt" style="display:none">
-        <button class="modal-close" onclick="window.parent.closeGame()">✕</button>
+        <button class="modal-close" onclick="closeThisGame()">✕</button>
         <img class = "warning" src="../../assets/warning.svg"/>
         <p>You have not yet completed the palming exercise!</p>
         <button>Resume exercise</button>
@@ -57,8 +58,17 @@
     <div class="reward">
         <h3>You've earned 20 points!</h3>
         <img class = "checkmark" src="../../assets/checkmark.svg"/>
-        <button class = "close-button" onclick="window.parent.closeGame()">Close</button>
+        <button class = "close-button" onclick="closeThisGame()">Close</button>
     </div>
     <script src="palming.js"></script>
+    <script>
+    function closeThisGame() {
+        if (window.electronAPI) {
+            window.electronAPI.closeGamePopup();
+        } else if (window.parent && window.parent.closeGame) {
+            window.parent.closeGame();
+        }
+    }
+    </script>
 </body>
 </html>
