@@ -69,7 +69,7 @@ def detect_blinks(df, baseline_blink_rate):
     blink_rate = blink_count / (df_duration / 60)
     print(f"Current Blink Rate: {round(blink_rate, 2)} blinks/min")
 
-    if blink_rate < baseline_blink_rate:
+    if blink_rate < 0.7*baseline_blink_rate:
         print("Blink rate detected to be low.")
         data_tracker.try_triggering_alert('tone_blinks/tone_blinks.html')
 
