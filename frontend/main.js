@@ -52,10 +52,10 @@ function openGamePopup(gameUrl) {
     resizable: false,
     minimizable: false,          // prevent user from minimizing it away
     fullscreenable: false,
-    frame: false,                // borderless — your game HTML has its own close button
+    frame: false,                // borderless — game HTML has its own close button
     transparent: false,
     backgroundColor: '#ffffff',
-    show: false,                 // don't flash — show after content loads
+    show: false,   
     webPreferences: {
       preload: path.join(__dirname, 'preload-game.js'),
       nodeIntegration: false,
@@ -70,7 +70,6 @@ function openGamePopup(gameUrl) {
     gamePopup.show();
     gamePopup.focus();
 
-    // On macOS, this extra call ensures focus even when user is in another app
     if (process.platform === 'darwin') {
       app.dock.bounce('critical');   // bounces dock icon to grab attention
       app.focus({ steal: true });    // brings Electron to foreground
@@ -93,7 +92,6 @@ function closeGamePopup() {
   }
 }
 
-// ── IPC Handlers ───────────────────────────────────────────────────
 ipcMain.on('open-game-popup', (event, gameUrl) => {
   openGamePopup(gameUrl);
 });
@@ -108,5 +106,4 @@ ipcMain.on('update-points', (event, total) => {
   }
 });
 
-// ── App Lifecycle ──────────────────────────────────────────────────
 app.whenReady().then(createWindow);

@@ -47,7 +47,6 @@ for (let imageContainer of imageContainers) {
   imageContainer.children[0].addEventListener("click", handleClick);
 }
 
-// When an image is clicked, let's detect it and display results!
 async function handleClick(event) {
   if (!faceLandmarker) {
     console.log("Wait for faceLandmarker to load before clicking!");
@@ -58,17 +57,12 @@ async function handleClick(event) {
     runningMode = "IMAGE";
     await faceLandmarker.setOptions({ runningMode });
   }
-  // Remove all landmarks drawed before
   const allCanvas = event.target.parentNode.getElementsByClassName("canvas");
   for (var i = allCanvas.length - 1; i >= 0; i--) {
     const n = allCanvas[i];
     n.parentNode.removeChild(n);
   }
 
-  // We can call faceLandmarker.detect as many times as we like with
-  // different image data each time. This returns a promise
-  // which we wait to complete and then call a function to
-  // print out the results of the prediction.
   const faceLandmarkerResult = faceLandmarker.detect(event.target);
   const canvas = document.createElement("canvas");
   canvas.setAttribute("class", "canvas");
@@ -388,11 +382,14 @@ document.getElementById('stop-log')?.addEventListener('click', stopLogging);
 document.getElementById('camToggle').addEventListener('change', enableCam);
 
 function openGame(url) {
-  // Use Electron popup instead of iframe modal
+  if (!logging) {
+    alert('Please start logging before beginning an exercise');
+    return;
+  }
+
   if (window.electronAPI) {
     window.electronAPI.openGamePopup(url);
   } else {
-    // Fallback: iframe modal (for dev/browser testing)
     document.getElementById('game-frame').src = url;
     document.getElementById('game-modal').style.display = 'flex';
   }
@@ -416,8 +413,6 @@ function closeGame() {
   }
 }
 
-// Listen for when the popup is closed (via X button in the game)
-// so we can notify Eel that the exercise ended
 if (window.electronAPI) {
   window.electronAPI.onGameClosed(() => {
     if (window.eel) {
